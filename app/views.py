@@ -16,7 +16,7 @@ dictCursor = psycopg2.extras.DictCursor
 
 
 def connectToDB():
-    connection = 'dbname=hms user=admin password=admin'
+    connection = 'dbname=hms user=postgres password=postgres'
     try:
         return psycopg2.connect(connection)
     except Exception:
