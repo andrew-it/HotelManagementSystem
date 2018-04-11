@@ -7,4 +7,10 @@
 {"first_name":"Harry","last_name":"Scott","payment_info":"3559335341130655","phone_number":"44-(317)469-2455"},
 {"first_name":"Theresa","last_name":"Rodriguez","payment_info":"3561055880968994","phone_number":"374-(533)362-1138"},
 {"first_name":"Jerry","last_name":"Mcdonald","payment_info":"3539641260067157","phone_number":"84-(771)933-9597"},
-{"first_name":"Donald","last_name":"Andrews","payment_info":"493637498169212895","phone_number":"63-(861)291-7401"},
+  {
+    "first_name": "Donald",
+    "last_name": "Andrews",
+    "payment_info": "493637498169212895",
+    "phone_number": "63-(861)291-7401"
+  }
+]
