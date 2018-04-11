@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, PasswordField, HiddenField, SubmitField, SelectField, TextAreaField, \
-    FileField, IntegerField
+from wtforms import BooleanField, FileField, HiddenField, IntegerField, PasswordField, SelectField, StringField, \
+    SubmitField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo
 
 
@@ -15,7 +15,8 @@ class RegisterForm(FlaskForm):
     last_name = StringField('last_name', validators=[DataRequired()])
     email = StringField('email', validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired()])
-    password_confirmation = PasswordField('password_confirmation', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
+    password_confirmation = PasswordField('password_confirmation', validators=[DataRequired(), EqualTo('password',
+                                                                                                       message='Passwords must match.')])
     telephone = StringField('telephone', validators=[DataRequired()])
 
 
@@ -42,7 +43,8 @@ class CUHotelForm(FlaskForm):
     city = StringField('city', validators=[DataRequired()])
     address = StringField('address', validators=[DataRequired()])
     description = TextAreaField('description', validators=[DataRequired()])
-    stars = SelectField('stars', choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')], validators=[DataRequired()])
+    stars = SelectField('stars', choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')],
+                        validators=[DataRequired()])
 
 
 class CReceptionistForm(FlaskForm):
@@ -69,6 +71,7 @@ class CRoomForm(FlaskForm):
     description = TextAreaField('description', validators=[DataRequired()])
     cost = StringField('cost', validators=[DataRequired()])
     save = SubmitField('save')
+
 
 class URoomForm(FlaskForm):
     room_id = HiddenField('room_id')

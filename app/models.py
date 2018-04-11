@@ -55,7 +55,7 @@ class AnonymousUser(object):
         return False
 
     def get_id(self):
-        return None  
+        return None
 
 
 class Customer(object):
