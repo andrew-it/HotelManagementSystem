@@ -1,16 +1,21 @@
-import psycopg2, psycopg2.extras
 import json
 import random
 import re
 import time
 
+import psycopg2
+import psycopg2.extras
+
 START_TIME = time.time()
+
 
 def connectToDB():
     return psycopg2.connect("dbname=hms user=admin password=admin")
 
+
 def wrapper(str):
     return "'" + str + "'"
+
 
 def readFromFile(filename):
     with open(filename, 'r') as f:
@@ -34,7 +39,6 @@ options_id = []
 config_id = []
 
 
-
 def countryGenerator():
     db = connectToDB()
     cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -44,14 +48,16 @@ def countryGenerator():
     f.close()
     f = open("country.sql", 'a')
     for i in range(len(country)):
-        country_query = "INSERT INTO country VALUES (" + "'" + country[i]['country'] + "','" + country[i]['city'] + "');\n"
+        country_query = "INSERT INTO country VALUES (" + "'" + country[i]['country'] + "','" + country[i][
+            'city'] + "');\n"
         cities_name.append(country[i]['city'])
         cur.execute(country_query)
-        #print(country_query)
+        # print(country_query)
         f.writelines(country_query)
     f.close()
     db.commit()
     db.close()
+
 
 def customersGenereator(times):
     db = connectToDB()
@@ -70,15 +76,19 @@ def customersGenereator(times):
                 global sys_userCount
                 customerCount += 1
                 sys_userCount += 1
-                sys_user_query = "INSERT INTO sys_user VALUES (DEFAULT, '" + str(k) + emails[i]['email'] + "', '$2b$12$tdsR.Lae9t0WaqDGwlF39.0BVMEAKQae1DF24tt.h6VI0OSyGIZHO', 'customer') RETURNING user_id;\n"
+                sys_user_query = "INSERT INTO sys_user VALUES (DEFAULT, '" + str(k) + emails[i][
+                    'email'] + "', '$2b$12$tdsR.Lae9t0WaqDGwlF39.0BVMEAKQae1DF24tt.h6VI0OSyGIZHO', 'customer') RETURNING user_id;\n"
                 cur.execute(sys_user_query)
                 customers[i]['user_id'] = str(cur.fetchone()['user_id'])
                 f.writelines(sys_user_query)
-                customer_qurey = "INSERT INTO customer VALUES (" + "'" + customers[i]['user_id']+ "','" + customers[i]['first_name'] + "','" + customers[i]['last_name'] + "','" + customers[i]['phone_number'] + "','" + customers[i]['payment_info'] + "'"');\n'
+                customer_qurey = "INSERT INTO customer VALUES (" + "'" + customers[i]['user_id'] + "','" + customers[i][
+                    'first_name'] + "','" + customers[i]['last_name'] + "','" + customers[i]['phone_number'] + "','" + \
+                                 customers[i]['payment_info'] + "'"');\n'
                 cur.execute(customer_qurey)
                 f.writelines(customer_qurey)
     db.commit()
     db.close()
+
 
 def hotel_adminsGenerator():
     db = connectToDB()
@@ -92,15 +102,18 @@ def hotel_adminsGenerator():
     admins = json.loads(admins)
     with open('hotel_admin.sql', 'a') as f:
         for i in range(len(emails)):
-            sys_user_query = "INSERT INTO sys_user VALUES (DEFAULT, '" + emails[i]['email'] + "', '$2b$12$tdsR.Lae9t0WaqDGwlF39.0BVMEAKQae1DF24tt.h6VI0OSyGIZHO', 'hotel_admin') RETURNING user_id;\n"
+            sys_user_query = "INSERT INTO sys_user VALUES (DEFAULT, '" + emails[i][
+                'email'] + "', '$2b$12$tdsR.Lae9t0WaqDGwlF39.0BVMEAKQae1DF24tt.h6VI0OSyGIZHO', 'hotel_admin') RETURNING user_id;\n"
             cur.execute(sys_user_query)
             admins[i]['user_id'] = str(cur.fetchone()['user_id'])
             hotel_admins_id.append(admins[i]['user_id'])
             f.writelines(sys_user_query)
-            hotel_admin_query = "INSERT INTO hotel_admin VALUES (" + "'" + admins[i]['user_id']+ "','" + admins[i]['first_name'] + "','" + admins[i]['last_name'] + "','" + admins[i]['phone_number'] + "');\n"
+            hotel_admin_query = "INSERT INTO hotel_admin VALUES (" + "'" + admins[i]['user_id'] + "','" + admins[i][
+                'first_name'] + "','" + admins[i]['last_name'] + "','" + admins[i]['phone_number'] + "');\n"
             cur.execute(hotel_admin_query)
             f.writelines(hotel_admin_query)
             db.commit()
+
 
 def optionsGenerator():
     db = connectToDB()
@@ -112,12 +125,15 @@ def optionsGenerator():
                 for tv in range(2):
                     for hub in range(2):
                         for air in range(2):
-                            option_query = "INSERT INTO room_option VALUES (DEFAULT ,'" + variants[bath] + "','" + variants[tv] + "','" + variants[wifi] + "','" + variants[hub] + "','" + variants[air] + "') RETURNING option_id;\n"
+                            option_query = "INSERT INTO room_option VALUES (DEFAULT ,'" + variants[bath] + "','" + \
+                                           variants[tv] + "','" + variants[wifi] + "','" + variants[hub] + "','" + \
+                                           variants[air] + "') RETURNING option_id;\n"
                             cur.execute(option_query)
                             tmp = cur.fetchone()['option_id']
                             options_id.append(tmp)
                             db.commit()
                             f.writelines(option_query)
+
 
 def configGenerator():
     db = connectToDB()
@@ -126,12 +142,14 @@ def configGenerator():
         for double in range(2):
             for single in range(4):
                 for sofa in range(2):
-                    config_query = "INSERT INTO room_config VALUES (DEFAULT ,'" + str(double) + "','" + str(single) + "','" + str(sofa) + "') RETURNING config_id;\n"
+                    config_query = "INSERT INTO room_config VALUES (DEFAULT ,'" + str(double) + "','" + str(
+                        single) + "','" + str(sofa) + "') RETURNING config_id;\n"
                     cur.execute(config_query)
                     tmp = cur.fetchone()['config_id']
                     config_id.append(tmp)
                     f.writelines(config_query)
                     db.commit()
+
 
 def rooms_generator(hotel_id):
     db = connectToDB()
@@ -140,10 +158,13 @@ def rooms_generator(hotel_id):
         room = json.loads(f.read())
     with open('room.sql', 'a') as f:
         for i in range(len(room)):
-            room_query = "INSERT INTO room VALUES (DEFAULT ,'" + str(hotel_id) + "','" + getRandomConfig() + "','" + getRandomOption() + "','" + getRandomQuantity() + "','" + room[i]['title'] + "','" + room[i]['description'] + "','" + getRandomCost() + "');\n";
+            room_query = "INSERT INTO room VALUES (DEFAULT ,'" + str(
+                hotel_id) + "','" + getRandomConfig() + "','" + getRandomOption() + "','" + getRandomQuantity() + "','" + \
+                         room[i]['title'] + "','" + room[i]['description'] + "','" + getRandomCost() + "');\n";
             f.writelines(room_query)
             cur.execute(room_query)
             db.commit()
+
 
 def hotels_Generator():
     db = connectToDB()
@@ -153,28 +174,36 @@ def hotels_Generator():
     hotel = json.loads(hotel)
     with open('hotel.sql', 'a') as f:
         for i in range(len(hotel)):
-            hotel_query = "INSERT INTO hotel VALUES (DEFAULT ,'" + getRandomCity() + "','" + hotel[i]['address'] + "','" + hotel[i]['name'] + "','" + getRandomStars() + "','" + hotel[i]['description'] + "','" + getRandomImg() + "','" + getRandomOwner() + "') RETURNING hotel_id;\n"
+            hotel_query = "INSERT INTO hotel VALUES (DEFAULT ,'" + getRandomCity() + "','" + hotel[i][
+                'address'] + "','" + hotel[i]['name'] + "','" + getRandomStars() + "','" + hotel[i][
+                              'description'] + "','" + getRandomImg() + "','" + getRandomOwner() + "') RETURNING hotel_id;\n"
             cur.execute(hotel_query)
             f.writelines(hotel_query)
             hotel_id = cur.fetchone()['hotel_id']
             hotels_id.append(hotel_id)
             db.commit()
 
+
 ######getters######
 def getRandomOption():
-    return str(options_id[random.randint(0, len(options_id)-1)])
+    return str(options_id[random.randint(0, len(options_id) - 1)])
+
 
 def getRandomConfig():
-    return str(config_id[random.randint(0, len(config_id)-1)])
+    return str(config_id[random.randint(0, len(config_id) - 1)])
+
 
 def getRandomQuantity():
     return str(random.randint(1, 10))
 
+
 def getRandomCost():
     return str(random.randint(1000, 3000))
 
+
 def getRandomStars():
     return str(random.randint(1, 5))
+
 
 def getRandomImg():
     imgs = ["/static/img/hotels/1.png",
@@ -183,13 +212,16 @@ def getRandomImg():
             "/static/img/hotels/4.png",
             "/static/img/hotels/5.png",
             ]
-    return imgs[random.randint(0, len(imgs)-1)]
+    return imgs[random.randint(0, len(imgs) - 1)]
+
 
 def getRandomCity():
-    return cities_name[random.randint(0, len(cities_name)-1)]
+    return cities_name[random.randint(0, len(cities_name) - 1)]
+
 
 def getRandomOwner():
-    return hotel_admins_id[random.randint(0, len(hotel_admins_id)-1)]
+    return hotel_admins_id[random.randint(0, len(hotel_admins_id) - 1)]
+
 
 ###################
 
@@ -214,5 +246,5 @@ with open("db_date.sql", 'a') as f:
 
 END_TIME = time.time()
 
-FINAL_TIME = END_TIME-START_TIME
-print("Time to generate = " + str(FINAL_TIME/60) + " min.")
+FINAL_TIME = END_TIME - START_TIME
+print("Time to generate = " + str(FINAL_TIME / 60) + " min.")
