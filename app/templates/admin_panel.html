@@ -1,0 +1,98 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading text-center"><h4>Add admin</h4></div>
+                    <div class="panel-body">
+                        <form action="" method="POST">
+                            {{ form.csrf_token() }}
+                            <div class="form-group">
+                                <label for="rtitle">First Name:</label>
+                                {{ form.first_name(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                <label for="rtitle">Last Name:</label>
+                                {{ form.last_name(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                <label for="rtitle">Email:</label>
+                                {{ form.email(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                <label for="rtitle">Password:</label>
+                                {{ form.password(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                <label for="rtitle">Phone:</label>
+                                {{ form.telephone(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="form-control btn btn-primary">Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading text-center"><h4>Statistics</h4></div>
+                    <div class="panel-body">
+                        <label for="">Hotels in system:</label>
+                        {{ hotels }}
+                        <hr>
+                        <label for="">Users in system:</label>
+                        {{ users }}
+                        <hr>
+                        <label for="">Numbackends:</label>
+                        {{ db_stat.numbackends }}
+                        <hr>
+                        <label for="">IO performance:</label>
+                        {{ db_stat.cache_hit_ratio }}
+                        <hr>
+                        <label for="">Admins:</label>
+                        {% for admin in admins %}
+                            <div class="well">
+                                <div class="row">
+                                <div class="col-md-3">
+                                    <label for="">First Name</label>
+                                </div>
+                                <div class="col-md-3">
+                                     <label for="">Last Name</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="">Email</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="">Phone</label>
+                                </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        {{ admin.first_name }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{ admin.last_name }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{ admin.email }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{ admin.phone_number }}
+                                    </div>
+                                </div>    
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+
+            </div>
+        </div>
+    </div>
+{% endblock content %}

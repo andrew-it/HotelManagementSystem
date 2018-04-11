@@ -1,0 +1,132 @@
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="well">
+                    <div class="row">
+                        <div class="col-md12">
+                            <h3>Search hotel:</h3>
+                            <label for="search">Enter the place..</label>
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </span>
+                                <input type="text" class="form-control" id="search"
+                                       placeholder="Enter city or hotel name...">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Enter check in...</label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                        <input type="text" class="form-control" id="datepickerIn">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>and check out date</label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                        <input type="text" class="form-control" id="datepickerOut">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="quantity">Enter quantity...</label>
+                                    <input type="number" min="0" value="1" class="form-control" id="quantity">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="sleeps">and persons...</label>
+                                    <input type="number" min="0" value="2" class="form-control" id="sleeps">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="ser">and click 'Search'!</label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-search" id="ser"></span>
+                                    </span>
+                                        <div class="form-control btn btn-primary">Search</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        <!-- тут в цикле по количеству отелей делаем эти строки -->
+                        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#myCarousel" data-slide-to="1"></li>
+                    </ol>
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner" role="listbox">
+                        <div class="item active" align="center">
+                            <img src="http://r-ec.bstatic.com/images/hotel/840x460/551/55126429.jpg" alt="Chania">
+                            <div class="carousel-caption">
+                                <div class="item-box">
+                                    <h3>Hotel National Zermatt</h3>
+                                    <p>Отель National расположен в центре города Церматт, прямо напротив
+                                        горнолыжного
+                                        подъемника Суннега-Парадайз, в 5 минутах ходьбы от железнодорожного
+                                        вокзала.</p>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- тут по циклу кидаем инфу о каждом отеле -->
+                        <div class="item" align="center">
+                            <img src="http://q-ec.bstatic.com/images/hotel/840x460/220/22008860.jpg" alt="Chania">
+                            <div class="carousel-caption">
+                                <div class="item-box">
+                                    <h3>Swiss Alpine Hotel Allalin</h3>
+                                    <p>В дизайне всего отеля Allalin использована резьба по дереву, что создает
+                                        очень
+                                        особую,
+                                        альпийскую атмосферу.</p>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Left and right controls -->
+                    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $("#datepickerIn").datepicker();
+        $("#datepickerIn").datepicker("option", "minDate", new Date());
+        $("#datepickerIn").datepicker("option", "defaultDate", new Date());
+        $("#datepickerIn").datepicker("option", "dateFormat", "dd-mm-yy");
+        $("#datepickerIn").datepicker("option", "constrainInput", true);
+        $("#datepickerOut").datepicker();
+        $("#datepickerOut").datepicker("option", "minDate", new Date());
+        $("#datepickerOut").datepicker("option", "defaultDate", new Date());
+        $("#datepickerOut").datepicker("option", "dateFormat", "dd-mm-yy");
+        $("#datepickerOut").datepicker("option", "constrainInput", true);
+    </script>

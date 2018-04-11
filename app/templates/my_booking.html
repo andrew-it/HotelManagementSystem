@@ -1,0 +1,98 @@
+{% extends "header.html" %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>My bookings</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Hotel -->
+                {% for inf in info %}
+                <div class="well well-sm">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h3>
+                                {{ inf.name }}
+                                <small>
+                                    {% for star in range(inf.stars) %}
+                                        <div class="glyphicon glyphicon-star"></div>
+                                    {% endfor %}
+                                </small>
+                            </h3>
+                            <small>
+                                {{ inf.country }}, {{ inf.city }}, {{ inf.address }}
+                            </small>
+                        </div>
+                        <div class="col-md-2" align="right">
+                        {% if inf.checkin_date > today %}
+                            <form action="" method="POST">
+                            {{ form.csrf_token() }}
+                            {{ form.transaction_id(value=inf.transaction_id) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-remove"></i></span>
+                                {{ form.delete(class="form-control btn btn-primary", value='Cancel') }}
+                            </div>
+                        </form>
+                        {% endif %}
+                        </div>
+                    </div>
+                    <!-- Bookings in this hotel -->
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <h4>{{ inf.title }}</h4>
+                        </div>
+                        <div class="col-md-10">
+                            <h5>{{ inf.description }}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                        {% if inf.is_airconditioniring %}
+                            <span class="glyphicon glyphicon-random" data-toggle="tooltip" title="Airconditioniting"></span>
+                        {% endif %}
+                        {% if inf.bathroom %}
+                            <span class="glyphicon glyphicon-unchecked" data-toggle="tooltip" title="Bathroom"></span>
+                        {% endif %}
+                        {% if inf.is_tv %}
+                            <span class="glyphicon glyphicon-sound-dolby" data-toggle="tooltip" title="TV"></span>
+                        {% endif %}
+                        {% if inf.is_wifi %}
+                            <span class="glyphicon glyphicon-signal" data-toggle="tooltip" title="Wi-Fi"></span>
+                        {% endif %}
+                        {% if inf.is_bathhub %}
+                            <span class="glyphicon glyphicon-cd" data-toggle="tooltip" title="Bathhub"></span>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-2">
+                            <span class="label label-success">
+                                Check-in: <span class="glyphicon glyphicon-calendar"></span>{{ inf.checkin_date }}
+                            </span>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="label label-success">
+                                Check-out: <span class="glyphicon glyphicon-calendar"></span>{{ inf.checkout_date }}
+                            </span>
+                        </div>
+                        <div class="col-md-2">
+                            Quantity: <span class="badge">{{ inf.booked }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            Total price:
+                        <span class="label label-default">
+                            <span class="glyphicon glyphicon-rub">{{ inf.amount }}</span>
+                        </span>
+                        </div>
+                    </div>
+                    <!-- /Bookings in this hotel -->
+                </div>
+                {% endfor %}
+                <!-- /Hotel -->
+            </div>
+        </div>
+    </div>
+{% endblock content %}

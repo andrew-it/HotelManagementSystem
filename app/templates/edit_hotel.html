@@ -1,0 +1,91 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                {% if hotel %}
+                    <h1>Edit hotel</h1>
+                {% else %}
+                    <h1>Add hotel</h1>
+                {% endif %}
+            </div>
+        </div>
+        <form action="" class="" method="POST" enctype="multipart/form-data">
+            {{ form.csrf_token() }}
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="hname">Hotel name:</label>
+                        {% if hotel %}
+                            {{ form.hotel_name(class="form-control", value=hotel.name) }}
+                        {% else %}
+                            {{ form.hotel_name(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    {% if hotel %}
+                        <img src="{{ hotel.img }}" class="img-thumbnail" id="img" alt="Hotel name">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/hotels/default.png') }}" class="img-thumbnail" id="img" alt="Hotel name">
+                    {% endif %}
+                    <label class="btn btn-primary btn-md btn-block">
+                        Change image
+                        {{ form.img(style="display: none;", id="file") }}
+                    </label>
+                </div>
+                <div class="col-sm-8">
+                    <div class="form-group">
+                        <label for="description">Country:</label>
+                        {% if hotel %}
+                            {{ form.country(class="form-control", value=hotel.country) }}
+                        {% else %}
+                            {{ form.country(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="description">City:</label>
+                        {% if hotel %}
+                            {{ form.city(class="form-control", value=hotel.city) }}
+                        {% else %}
+                            {{ form.city(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Address:</label>
+                        {% if hotel %}
+                            {{ form.address(class="form-control", value=hotel.address) }}
+                        {% else %}
+                            {{ form.address(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        {% if hotel %}
+                            {% set tmp = form.description.process_data(hotel.description) %}
+                        {% endif %}
+                        {{ form.description(class="form-control", rows="5") }}
+                    </div>
+                    <div class="form-group">
+                        <label for="stars">Select stars:</label>
+                        {% if hotel %}
+                            {% set tmp = form.stars.process_data(hotel.stars) %}
+                        {% endif %}
+                        {{ form.stars(class="form-control") }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 col-md-offset-10">
+                    <button type="submit" class="form-control btn btn-primary btn-md btn-block">
+                        <span class="glyphicon glyphicon-floppy-disk"></span> Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/imgload.js') }}"></script>
+{% endblock content %}

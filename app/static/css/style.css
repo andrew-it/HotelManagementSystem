@@ -1,0 +1,51 @@
+.login > div {
+    margin-bottom: 25px;
+}
+
+.login > div:last-child {
+    margin-bottom: 10px;
+}
+
+.header {
+    font-size: 21px;
+}
+
+
+.carousel-inner {}
+    .carousel-inner .item-box {
+        z-index: 2;
+        text-shadow: 1px 1px 2px black, 0 0 1em black;
+        color: #fff;
+        border-radius: 10px;
+
+        background: rgba(55, 55, 55, 0.5);
+    }
+    .carousel-inner .item-box.top {
+        top: 5%;
+    }
+    .carousel-inner .item-box.left {
+        left: 5%;
+    }
+    .carousel-inner .item-box.right {
+        right: 5%;
+    }
+
+body { 
+    padding-top: 70px; 
+}
+
+.navbar {
+    background-color: #003580;
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color:  #fff;
+}
+
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover {
+    background-color: #0896ff;
+}
+
+.navbar-inverse .navbar-brand {
+    color: #fff;
+}

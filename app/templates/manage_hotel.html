@@ -1,0 +1,438 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>Manage Hotel</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <h2>{{ hotel.name }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <img src="{{ hotel.img }}" class="img-thumbnail" alt="Hotel name">
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group">
+                    <h4>Address: {{ hotel.address }}</h4>
+                </div>
+                <div class="form-group">
+                    <h4>Description: {{ hotel.description }}</h4>
+                </div>
+                <div class="form-group">
+                    <h4>
+                        {% for star in range(hotel.stars) %}
+                            <span class="glyphicon glyphicon-star"></span>
+                        {% endfor %}
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <!-- добавление -->
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                           aria-expanded="true" aria-controls="collapseOne">
+                            <span class="glyphicon glyphicon-plus"></span> Add receptionist
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <form action="" method="POST">
+                                        {{ recForm.csrf_token() }}
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="rtitle">First Name:</label>
+                                                {{ recForm.first_name(class="form-control") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="rtitle">Last Name:</label>
+                                                {{ recForm.last_name(class="form-control") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="rtitle">Phone:</label>
+                                                {{ recForm.telephone(class="form-control") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="rtitle">E-mail:</label>
+                                                {{ recForm.email(class="form-control") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="rtitle">Password:</label>
+                                                {{ recForm.password(class="form-control") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="rtitle">Salary:</label>
+                                                {{ recForm.salary(class="form-control", min="0", type="number", value="0") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i
+                                                        class="glyphicon glyphicon-floppy-disk"></i></span>
+                                                {{ recForm.save(class="form-control btn btn-primary btn-md btn-block") }}
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingTwo">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                           href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <span class="glyphicon glyphicon-plus"></span> Add room
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                    <div class="panel-body">
+                        <div class="row">
+                            <form action="" method="POST">
+                                {{ roomForm.csrf_token() }}
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <h4><span class="glyphicon glyphicon-option-vertical"></span>Options:
+                                                    </h4>
+                                                    <div class="checkbox">
+                                                        <label>{{ roomForm.is_bathroom }}Bathroom</label>
+                                                    </div>
+                                                    <div class="checkbox">
+                                                        <label>{{ roomForm.is_tv }}TV</label>
+                                                    </div>
+                                                    <div class="checkbox">
+                                                        <label>{{ roomForm.is_wifi }}Wi-Fi</label>
+                                                    </div>
+                                                    <div class="checkbox">
+                                                        <label>{{ roomForm.is_bathhub }}Bathtub</label>
+                                                    </div>
+                                                    <div class="checkbox">
+                                                        <label>{{ roomForm.is_aircond }}Air-conditioner</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h4><span class="glyphicon glyphicon-bed"></span> Config:</h4>
+                                                    <div class="row">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-md-7">Single bed</label>
+                                                            <div class="col-md-5">
+                                                                {{ roomForm.sing_bed(type="number", min="0", class="form-control input-sm", value="0") }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="control-label col-md-7">Double bed</label>
+                                                            <div class="col-md-5">
+                                                                {{ roomForm.doub_bed(type="number", min="0", class="form-control input-sm", value="0") }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="control-label col-md-7">Sofa</label>
+                                                            <div class="col-md-5">
+                                                                {{ roomForm.sofa_bed(type="number", min="0", class="form-control input-sm", value="0") }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="form-group">
+                                                        <label for="quantity">Quantity:</label>
+                                                        {{ roomForm.quantity(type="number", min="0", class="form-control") }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div class="form-group">
+                                                <label for="rtitle">Title:</label>
+                                                {{ roomForm.title(class="form-control") }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="rdesc">Description:</label>
+                                                {{ roomForm.description(class="form-control", rows="5") }}
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">
+                                                            <span class="glyphicon glyphicon-rub"></span>
+                                                        </span>
+                                                        {{ roomForm.cost(type="number", min="0", placeholder="Cost per day", class="form-control") }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i
+                                                                class="glyphicon glyphicon-floppy-disk"></i></span>
+                                                        {{ roomForm.save(class="form-control btn btn-primary btn-md btn-block", value="Save") }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Сами комнаты -->
+        <div class="row">
+            <div class="col-md-9">
+                <h2>Rooms:</h2>
+                {% for room in rooms %}
+                    <div class="well">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <h3>
+                                        {{ room.title }}
+                                        <small>
+                                            {{ room.cost }}<span class="glyphicon glyphicon-rub"></span>/day
+                                        </small>
+                                    </h3>
+                                    <hr>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        {% if room.is_bathroom %}
+                                            <span class="glyphicon glyphicon-unchecked"></span> Bathroom <br>
+                                        {% endif %}
+                                        {% if room.is_tv %}
+                                            <span class="glyphicon glyphicon-sound-dolby"></span> TV <br>
+                                        {% endif %}
+                                        {% if room.is_wifi %}
+                                            <span class="glyphicon glyphicon-signal"></span> Wi-Fi <br>
+                                        {% endif %}
+                                        {% if room.is_bathhub %}
+                                            <span class="glyphicon glyphicon-cd"></span> Bathhub <br>
+                                        {% endif %}
+                                        {% if room.is_airconditioniring %}
+                                            <span class="glyphicon glyphicon-random"></span> Airconditioniting <br>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2">
+                                        {% if room.single_bed > 0 %}
+                                            <span class="badge">{{ room.single_bed }}</span> Single bed <br>
+                                        {% endif %}
+                                        {% if room.double_bed > 0 %}
+                                            <span class="badge">{{ room.double_bed }}</span> Double bed <br>
+                                        {% endif %}
+                                        {% if room.sofa_bed > 0 %}
+                                            <span class="badge">{{ room.sofa_bed }}</span> Sofa <br>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <p>
+                                            {{ room.description }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        Quantity: <span class="badge">{{ room.quantity }}</span>
+                                    </div>
+                                    <div class="col-sm-2 col-md-offset-8">
+                                        <div class="btn-group btn-group-vertical">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                </span>
+                                                <form type="button" class="btn btn-primary btn-block"
+                                                      data-toggle="modal"
+                                                      data-target="#{{ room.room_id }}">
+                                                    Edit
+                                                </form>
+                                            </div>
+
+                                            <!-- Modal -->
+                                            <form action="" method="POST">
+                                                <div id="{{ room.room_id }}" class="modal fade" role="dialog">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="cloimport timese"
+                                                                        data-dismiss="modal">&times;</button>
+                                                                <h4 class="modal-title">Edit room</h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="row">
+                                                                    {{ form2.csrf_token() }}
+                                                                    {{ form2.room_id(value=room.room_id) }}
+                                                                    <div class="col-sm-12">
+                                                                        <div class="row">
+                                                                            <div class="col-sm-12">
+                                                                                <div class="form-group">
+                                                                                    <label for="rtitle">Title:</label>
+                                                                                    {{ form2.title(class="form-control", value=room.title) }}
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="rdesc">Description:</label>
+                                                                                    {% set tmp = form2.description.process_data(room.description) %}
+                                                                                    {{ form2.description(class="form-control", rows="5") }}
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-sm-6">
+                                                                                        <h4><span
+                                                                                                class="glyphicon glyphicon-option-vertical"></span>Options:
+                                                                                        </h4>
+                                                                                        <div class="checkbox">
+                                                                                            <label>{{ form2.is_bathroom(checked=room.is_bathroom) }}Bathroom</label>
+                                                                                        </div>
+                                                                                        <div class="checkbox">
+                                                                                            <label>{{ form2.is_tv(checked=room.is_tv) }}TV</label>
+                                                                                        </div>
+                                                                                        <div class="checkbox">
+                                                                                            <label>{{ form2.is_wifi(checked=room.is_wifi) }}Wi-Fi</label>
+                                                                                        </div>
+                                                                                        <div class="checkbox">
+                                                                                            <label>{{ form2.is_bathhub(checked=room.is_bathhub) }}Bathhub</label>
+                                                                                        </div>
+                                                                                        <div class="checkbox">
+                                                                                            <label>{{ form2.is_aircond(checked=room.is_airconditioring) }}Airconditioniring</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <h4><span
+                                                                                                class="glyphicon glyphicon-bed"></span>
+                                                                                            Config:</h4>
+                                                                                        <div class="row">
+                                                                                            <div class="form-group">
+                                                                                                <label class="control-label col-md-7">Single
+                                                                                                    bed</label>
+                                                                                                <div class="col-md-5">
+                                                                                                    {{ form2.sing_bed(type="number", min="0", class="form-control input-sm", value=room.single_bed) }}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="form-group">
+                                                                                                <label class="control-label col-md-7">Double
+                                                                                                    bed</label>
+                                                                                                <div class="col-md-5">
+                                                                                                    {{ form2.doub_bed(type="number", min="0", class="form-control input-sm", value=room.double_bed) }}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="form-group">
+                                                                                                <label class="control-label col-md-7">Sofa</label>
+                                                                                                <div class="col-md-5">
+                                                                                                    {{ form2.sofa_bed(type="number", min="0", class="form-control input-sm", value=room.sofa_bed) }}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-md-12">
+                                                                                        <div class="input-group">
+                                                                                            <span class="input-group-addon">
+                                                                                                <span class="glyphicon glyphicon-rub"></span>
+                                                                                            </span>
+                                                                                            {{ form2.cost(type="number", min="0", placeholder="Cost per day", class="form-control", value=room.cost) }}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-sm-12">
+                                                                                        <div class="form-group">
+                                                                                            <label for="quantity">Quantity:</label>
+                                                                                            {{ form2.quantity(type="number", min="0", class="form-control", value=room.quantity) }}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-default"
+                                                                        data-dismiss="modal">Close
+                                                                </button>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon"><i
+                                                                            class="glyphicon glyphicon-floppy-disk"></i></span>
+                                                                    {{ form2.edit(class="form-control btn btn-default", value="Save") }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <!-- /Modal -->
+                                            <form action="" class="btn-group" method="POST">
+                                                {{ form.csrf_token() }}
+                                                {{ form.room_id(value=room.room_id) }}
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i
+                                                            class="glyphicon glyphicon-trash"></i></span>
+                                                    {{ form.delete(class="form-control btn btn-primary", value="Delete") }}
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-3">
+                <h2>Receptionists:</h2>
+                {% for rec in recep %}
+                    <div class="well">
+                        <div class="col-md-12">
+                            <label>First Name:</label>
+                            <p>{{ rec.first_name }}</p>
+                            <label>Second Name:</label>
+                            <p>{{ rec.last_name }}</p>
+                            <label>E-mail:</label>
+                            <p>{{ rec.email }}</p>
+                            <label>Phone:</label>
+                            <p>{{ rec.phone_number }}</p>
+                            <label>Salary:</label>
+                            <p>{{ rec.salary }}</p>
+                        </div>
+                        <form action="" method="POST">
+                            {{ form3.csrf_token() }}
+                            {{ form3.user_id(value=rec.user_id) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-trash"></i></span>
+                                {{ form3.del_rec(class="form-control btn btn-primary", value="Delete") }}
+                            </div>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

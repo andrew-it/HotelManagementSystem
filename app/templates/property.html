@@ -1,0 +1,53 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+                <div class="panel panel-default">
+                    <div class="header panel-heading text-center">Registration for hoteliers</div>
+                    <div class="panel-body">
+                        <form action="" class="register" method="POST">
+                            {{ form.hidden_tag() }}
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        {{ form.first_name(class="form-control", placeholder="First Name") }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        {{ form.last_name(class="form-control", placeholder="Last Name") }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {{ form.email(class="form-control", placeholder="Email Address") }}
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        {{ form.password(class="form-control", placeholder="Password") }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        {{ form.password_confirmation(class="form-control", placeholder="Confirm Password") }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {{ form.telephone(class="form-control", placeholder="Telephone Number") }}
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-info btn-block">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

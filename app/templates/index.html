@@ -1,0 +1,156 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="container">
+        <!-- Search panel -->
+        <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-default">
+            <div class="panel-heading text-center">
+                <h4>Find your hotel</h4>
+            </div>
+            <div class="panel-body">
+                <form action="" method="POST">
+                {{ form.csrf_token() }}
+                <div class="">
+                    <label for="search">Destination/Hotel Name</label>
+                    <div class="input-group">
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </span>
+                        {% if search %}
+                            {{ form.destination(class="form-control", value=search.destination) }}    
+                        {% else %}
+                            {{ form.destination(class="form-control") }}
+                        {% endif %}
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="checkin">Check-in</label>
+                            <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                                {% if search %}
+                                    {{ form.checkin(class="form-control tcal", id="datepickerIn", value=search.checkin) }}
+                                {% else %}
+                                    {{ form.checkin(class="form-control tcal", id="datepickerIn") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="checkout">Check-out</label>
+                            <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                                {% if search %}
+                                    {{ form.checkout(class="form-control tcal",  id="datepickerOut", value=search.checkout) }}
+                                {% else %}
+                                    {{ form.checkout(class="form-control tcal",  id="datepickerOut") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <label for="">Filter by:</label>
+                    <div class="row">
+                        <div class="col-md-5">
+                        {% if seacrh and search.is_bathroom %}
+                            {{ form.is_bathroom(checked=search.is_bathroom) }} Bathroom <br>
+                            {{ form.is_tv(checked=search.is_tv) }} TV <br>
+                            {{ form.is_wifi(checked=search.is_wifi) }} Wi-Fi <br>
+                            {{ form.is_bathhub(checked=search.is_bathhub) }} Bathtub <br>
+                            {{ form.is_airconditioniring(checked=search.is_aircond) }} Air-conditioner
+                        {% else %}
+                            {{ form.is_bathroom() }} Bathroom <br>
+                            {{ form.is_tv() }} TV <br>
+                            {{ form.is_wifi() }} Wi-Fi <br>
+                            {{ form.is_bathhub() }} Bathtub <br>
+                            {{ form.is_airconditioniring }} Air-conditioner
+                        {% endif %}
+                        </div>
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="control-label col-md-7">Persons</label>
+                                    <div class="col-md-5">
+                                    {% if search %}
+                                        {{ form.sleeps(type="number", min="1", value=search.sleeps, class="form-control") }}
+                                    {% else %}
+                                        {{ form.sleeps(type="number", min="1", value="1", class="form-control") }}
+                                    {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Specify the price range:</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-rub">min</span>
+                            </span>
+                                {% if search %}
+                                    {{ form.price_from(class="form-control", type="number", min="0", value=search.price_from) }}    
+                                {% else %}
+                                    {{ form.price_from(class="form-control", type="number", min="0", value="0") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-rub">max</span>
+                            </span>
+                                {% if search %}
+                                    {{ form.price_to(class="form-control", type="number", min="0", value=search.price_to) }}
+                                {% else %}
+                                    {{ form.price_to(class="form-control", type="number", min="0", value="0") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="quantity">Rooms</label>
+                            {% if search %}
+                                {{ form.quantity(class="form-control", type="number", min="1", value=search.quantity) }}
+                            {% else %}
+                                {{ form.quantity(class="form-control", type="number", min="1", value="1") }}
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <label for="searchbtn">Click 'Search'!</label>
+                            <button type="submit" class="form-control btn btn-primary">
+                                <span class="glyphicon glyphicon-search"></span> Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+        </div>
+    <script>
+        $("#datepickerIn").datepicker();
+        $("#datepickerIn").datepicker("option", "minDate", new Date());
+        $("#datepickerIn").datepicker("option", "defaultDate", new Date());
+        $("#datepickerIn").datepicker("option", "dateFormat", "dd-mm-yy");
+        $("#datepickerIn").datepicker("option", "constrainInput", true);
+        $("#datepickerOut").datepicker();
+        $("#datepickerOut").datepicker("option", "minDate", new Date());
+        $("#datepickerOut").datepicker("option", "defaultDate", new Date());
+        $("#datepickerOut").datepicker("option", "dateFormat", "dd-mm-yy");
+        $("#datepickerOut").datepicker("option", "constrainInput", true);
+    </script>
+{% endblock content %}

@@ -1,0 +1,83 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-10">
+                <h1>My hotels</h1>
+            </div>
+            <div class="col-sm-2">
+                <form action="" method="POST">
+                    {{ form.csrf_token() }}
+                    <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-plus-sign"></i>
+                </span>
+                        {{ form.add_hotel(class="form-control btn btn-primary", value="Add hotel") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                {% for hotel in hotels %}
+                    <div class="well well-sm">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <!-- в alt передавать hotel name -->
+                                <img src="{{ hotel.img }}" name="hotel_img"
+                                     class="img-thumbnail" alt="{{ hotel.name }}">
+                            </div>
+                            <div class="col-sm-8">
+                                <div>
+                                    <h1>
+                                        {{ hotel.name }} <br>
+                                        <small>
+                                            {{ hotel.address }}
+                                        </small>
+                                    </h1>
+                                    <hr>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-9">
+                                        <p>
+                                            {{ hotel.description }}
+                                        </p>
+                                        <p>
+                                            {% for stars in range(hotel.stars) %}
+                                                <span class="glyphicon glyphicon-star"></span>
+                                            {% endfor %}
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="btn-group">
+                                            <form action="" class="btn-group" method="POST">
+                                                {{ form.csrf_token() }}
+                                                {{ form.hotel_id(value=hotel.hotel_id) }}
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i
+                                                            class="glyphicon glyphicon-edit"></i></span>
+                                                    {{ form.edit(class="form-control btn btn-primary", value="Edit") }}
+                                                </div>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i
+                                                            class="glyphicon glyphicon-trash"></i></span>
+                                                    {{ form.delete(class="form-control btn btn-primary", value="Delete") }}
+                                                </div>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i
+                                                            class="glyphicon glyphicon-wrench"></i></span>
+                                                    {{ form.manage(class="form-control btn btn-primary", value="Manage") }}
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

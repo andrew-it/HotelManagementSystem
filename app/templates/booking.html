@@ -1,0 +1,196 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+            <div class="col-sm-4">
+            <img src="{{ hotel.img }}"
+                             class="img-thumbnail" alt="Hotel name">
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group">
+                    <h3>{{ hotel.name }}</h3>
+                </div>
+                <div class="form-group">
+                    <h5>{{ hotel.country }}, {{ hotel.city }}, {{ hotel.address }}</h5>
+                </div>
+                <div class="form-group">
+                    <h5>
+                        {% for star in range(hotel.stars) %}
+                            <span class="glyphicon glyphicon-star"></span>
+                        {% endfor %}
+                    </h5>
+                </div>
+                <div class="form-group">
+                    <h5>Description: {{ hotel.description }}</h5>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+            <div class="col-md-12">
+                <h3>Rooms:</h3>
+                {% for room in rooms %}
+                    <div class="well">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    <h3>
+                                        {{ room.title }}
+                                        <small>
+                                            <div id="cost-{{ room.room_id }}">{{ room.cost }} <span class="glyphicon glyphicon-rub"></span>/night</div>
+                                        </small>
+                                    </h3>
+                                    <hr>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        {% if room.is_bathroom %}
+                                            <span class="glyphicon glyphicon-unchecked"></span> Bathroom <br>
+                                        {% endif %}
+                                        {% if room.is_tv %}
+                                            <span class="glyphicon glyphicon-sound-dolby"></span> TV <br>
+                                        {% endif %}
+                                        {% if room.is_wifi %}
+                                            <span class="glyphicon glyphicon-signal"></span> Wi-Fi <br>
+                                        {% endif %}
+                                        {% if room.is_bathhub %}
+                                            <span class="glyphicon glyphicon-cd"></span> Bathhub <br>
+                                        {% endif %}
+                                        {% if room.is_airconditioniring %}
+                                            <span class="glyphicon glyphicon-random"></span> Airconditioniting <br>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2">
+                                        {% if room.single_bed > 0 %}
+                                            <span class="badge">{{ room.single_bed }}</span> Single bed <br>
+                                        {% endif %}
+                                        {% if room.double_bed > 0 %}
+                                            <span class="badge">{{ room.double_bed }}</span> Double bed <br>
+                                        {% endif %}
+                                        {% if room.sofa_bed > 0 %}
+                                            <span class="badge">{{ room.sofa_bed }}</span> Sofa <br>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <p>
+                                            {{ room.description }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                            <input type="number" min="1" class="form-control" min="1" value="1"
+                                                   max="5" id="quantity-{{ room.room_id }}">
+                                        </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                </span>
+                                            <button type="button" class="form-control btn btn-primary btn-block"
+                                                      data-toggle="modal" data-target="#myModal" onClick="modalFunction({{ room.room_id }})"> Book
+                                            </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        </div>
+        </div>
+    </div>
+        
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Book room</h4>
+                </div>
+                <div class="modal-body">
+                <form action="" method="POST">
+                {{ form.csrf_token() }}
+                {{ form.room_id(id="room_id") }}
+                {{ form.quantity(id="quantity") }}
+                {{ form.amount(id="amount") }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Your name:</label>
+                            {{ form.first_name(class="form-control", value=cust_info.first_name) }}
+                        </div>
+                        <div class="col-md-6">
+                            <label>Your second name:</label>
+                            {{ form.last_name(class="form-control", value=cust_info.last_name) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Your e-mail:</label>
+                            {{ form.email(class="form-control", value=cust_info.email) }}
+                        </div>
+                        <div class="col-md-12">
+                            <label>Payment method:</label>
+                            {{ form.payment_info(class="form-control", value=cust_info.payment_info) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Check-in:</label>
+                            {{ form.checkin(class="form-control", value=search.checkin, id="checkin") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label>Check-out:</label>
+                            {{ form.checkout(class="form-control", value=search.checkout, id="checkout") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Total length to stay: <span class="label label-default" id="dayscount">кол-во дней</span> days
+                        </div>
+                        <div class="col-md-6">
+                            Total cost: <span class="label label-success" id="cost">стоимость</span>
+                            <span class="glyphicon glyphicon-rub"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default"
+                            data-dismiss="modal">Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Book
+                        </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <script type="text/javascript">
+        function modalFunction(id) {
+            d1 = new Date(document.getElementById('checkin').value);
+            d2 = new Date(document.getElementById('checkout').value);
+            days = (d2 - d1)/(1000*60*60*24);
+            cost = parseInt(document.getElementById('cost-' + id).innerHTML, 10);
+            quantity = parseInt(document.getElementById('quantity-' + id).value, 10);
+            document.getElementById('cost').innerHTML = quantity * days * cost;
+            document.getElementById('dayscount').innerHTML = days
+            document.getElementById('room_id').value = id
+            document.getElementById('quantity').value = quantity
+            document.getElementById('amount').value = cost
+        }
+    </script>
+{% endblock content %}

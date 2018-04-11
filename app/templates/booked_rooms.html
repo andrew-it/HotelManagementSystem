@@ -1,0 +1,105 @@
+{% extends "header.html" %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="well well-sm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3>
+                                {{ hotel.name }}
+                                <small>
+                                    {% for star in range(hotel.stars)  %}
+                                        <div class="glyphicon glyphicon-star"></div>
+                                    {% endfor %}
+                                </small>
+                            </h3>
+                            <small>
+                                {{ hotel.country }}, {{ hotel.city }}, {{ hotel.address }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3>
+                                Booked rooms
+                            </h3>
+                        </div>
+                    </div>
+                    {% for booking in bookings  %}
+                        <div class="well">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <h4>{{ booking.title }}</h4>
+                                </div>
+                                <div class="col-md-8">
+                                    <h5>{{ booking.description }}</h5>
+                                </div>
+                                <div class="col-md-2" align="right">
+                                    <button type="button" class="btn btn-primary" data-toggle="tooltip" title="Delete entry"
+                                            data-placement="left">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                {% if booking.is_airconditioniring %}
+                                    <span class="glyphicon glyphicon-random" data-toggle="tooltip" title="Airconditioniting"></span>
+                                {% endif %}
+                                {% if booking.bathroom %}
+                                    <span class="glyphicon glyphicon-unchecked" data-toggle="tooltip" title="Bathroom"></span>
+                                {% endif %}
+                                {% if booking.is_tv %}
+                                    <span class="glyphicon glyphicon-sound-dolby" data-toggle="tooltip" title="TV"></span>
+                                {% endif %}
+                                {% if booking.is_wifi %}
+                                    <span class="glyphicon glyphicon-signal" data-toggle="tooltip" title="Wi-Fi"></span>
+                                {% endif %}
+                                {% if booking.is_bathhub %}
+                                    <span class="glyphicon glyphicon-cd" data-toggle="tooltip" title="Bathhub"></span>
+                                {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Customer's name:</label> {{ booking.first_name }} {{ booking.last_name }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Customer's phone:</label> {{ booking.phone_number }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <!-- nothing -->
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="label label-success">
+                                        Check-in: <span class="glyphicon glyphicon-calendar"></span>{{ booking.checkin_date }}
+                                    </span>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="label label-success">
+                                        Check-out: <span class="glyphicon glyphicon-calendar"></span>{{ booking.checkout_date }}
+                                    </span>
+                                </div>
+                                <div class="col-md-2">
+                                    Quantity: <span class="badge">{{ booking.quantity }}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <!-- -->
+                                </div>
+                                <div class="col-md-2">
+                                    Total price:
+                                    <span class="label label-default">
+                                    <span class="glyphicon glyphicon-rub">{{ booking.amount }}</span>
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>    <!-- Modal -->
+{% endblock content %}

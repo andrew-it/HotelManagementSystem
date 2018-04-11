@@ -1,0 +1,67 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="container">
+        <!-- Hotels -->
+        <div class="col-md-12">
+            <!-- loop по well -->
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <h4>Search results</h4>
+                </div>
+                <div class="panel-body">
+                    {% if hotels %}
+                {% for hotel in hotels %}
+                    <div class="well well-sm">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <!-- в alt передавать hotel name -->
+                                <img src="{{ hotel.img }}"
+                                     class="img-thumbnail" alt="{{ hotel.name }}">
+                            </div>
+                            <div class="col-sm-8">
+                                <div>
+                                    <h3>
+                                        {{ hotel.name }} <br>
+                                        <small>
+                                            {{ hotel.country }}, {{ hotel.city }}, {{ hotel.address }}  
+                                        </small>
+                                    </h3>
+                                    {% for stars in range(hotel.stars) %}
+                                        <span class="glyphicon glyphicon-star"></span>
+                                    {% endfor %}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6>{{ hotel.description }}</h6>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <form action="" method="POST">
+                                    {{ form.csrf_token() }}
+                                    {{ form.hotel_id(value=hotel.hotel_id) }}
+                                    {{ form.info(class="btn btn-primary btn-block", value="Reserve") }}
+                                </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $("#datepickerIn").datepicker();
+        $("#datepickerIn").datepicker("option", "minDate", new Date());
+        $("#datepickerIn").datepicker("option", "defaultDate", new Date());
+        $("#datepickerIn").datepicker("option", "dateFormat", "dd-mm-yy");
+        $("#datepickerIn").datepicker("option", "constrainInput", true);
+        $("#datepickerOut").datepicker();
+        $("#datepickerOut").datepicker("option", "minDate", new Date());
+        $("#datepickerOut").datepicker("option", "defaultDate", new Date());
+        $("#datepickerOut").datepicker("option", "dateFormat", "dd-mm-yy");
+        $("#datepickerOut").datepicker("option", "constrainInput", true);
+    </script>
+{% endblock content %}
