@@ -1,14 +1,26 @@
 import time
 import unittest
 
+from flask import Flask
+from flask_testing import LiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
 
 
-class AddNewHotelOwner(unittest.TestCase):
+class AddNewHotelOwner(LiveServerTestCase):
     login_and_pass = ''
+
+    def create_app(self):
+        app = Flask(__name__)
+        app.config.update(
+            # Specify the test database
+            SQLALCHEMY_DATABASE_URI='mysql://dt_admin:dt2016@localhost/dreamteam_test',
+            # Change the port that the liveserver listens on
+            LIVESERVER_PORT=8943
+        )
+        return app
 
     def setUp(self):
         self.driver = webdriver.Firefox()
@@ -19,8 +31,6 @@ class AddNewHotelOwner(unittest.TestCase):
 
     def test1_add_new_hotel_owner(self):
         AddNewHotelOwner.login_and_pass = str(int(time.time()))
-
-        print('logpass', AddNewHotelOwner.login_and_pass)
 
         driver = self.driver
         driver.get("http://127.0.0.1:5000/index")
@@ -47,8 +57,6 @@ class AddNewHotelOwner(unittest.TestCase):
 
     def test2_add_new_hotel(self):
         driver = self.driver
-
-        print('logpass', AddNewHotelOwner.login_and_pass)
 
         driver.get("http://127.0.0.1:5000/index")
         driver.find_element_by_link_text("Sign in").click()
@@ -79,7 +87,7 @@ class AddNewHotelOwner(unittest.TestCase):
         driver.find_element_by_id("description").click()
         Select(driver.find_element_by_id("stars")).select_by_visible_text("5")
         driver.find_element_by_xpath("//option[@value='5']").click()
-        driver.find_element_by_xpath("//div[2]/div/label").click()
+        # driver.find_element_by_xpath("//div[2]/div/label").click()
         driver.find_element_by_xpath("//button[@type='submit']").click()
 
     def is_element_present(self, how, what):

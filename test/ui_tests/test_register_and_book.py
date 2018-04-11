@@ -1,13 +1,25 @@
 import time
 import unittest
 
+from flask import Flask
+from flask_testing import LiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
 
 
-class Register(unittest.TestCase):
+class Register(LiveServerTestCase):
     login_and_pass = ''
+
+    def create_app(self):
+        app = Flask(__name__)
+        app.config.update(
+            # Specify the test database
+            SQLALCHEMY_DATABASE_URI='mysql://dt_admin:dt2016@localhost/dreamteam_test',
+            # Change the port that the liveserver listens on
+            LIVESERVER_PORT=8943
+        )
+        return app
 
     def setUp(self):
         self.driver = webdriver.Firefox()
@@ -18,8 +30,6 @@ class Register(unittest.TestCase):
 
     def test1_register(self):
         Register.login_and_pass = str(int(time.time()))
-
-        print('logpass', Register.login_and_pass)
 
         driver = self.driver
         driver.get("http://127.0.0.1:5000/")
@@ -45,8 +55,6 @@ class Register(unittest.TestCase):
         driver.find_element_by_xpath("//button[@type='submit']").click()
 
     def test2_search_and_book(self):
-        print('logpass', Register.login_and_pass)
-
         driver = self.driver
 
         driver.get("http://127.0.0.1:5000/index")
