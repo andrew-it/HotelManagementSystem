@@ -10,7 +10,7 @@ START_TIME = time.time()
 
 
 def connectToDB():
-    return psycopg2.connect("dbname=hms user=postgres password=postgres")
+    return psycopg2.connect("dbname=hms user=postgres password=postgres host='0.0.0.0'")
 
 
 def wrapper(str):

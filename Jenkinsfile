@@ -18,6 +18,20 @@ timestamps {
                 """
             }
 
+            stage ('Init DB'){
+                sh """
+
+                . venv/bin/activate
+                which python
+
+                python init_db.py
+
+                cd data_generator
+                python generateSQL.py
+
+                """
+            }
+
             stage ('Run Tests'){
                 sh """
                 . venv/bin/activate
