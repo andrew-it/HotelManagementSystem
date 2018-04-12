@@ -3,9 +3,12 @@ import unittest
 
 from flask import Flask
 from flask_testing import LiveServerTestCase
+
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.firefox.options import Options
+
 
 
 class Register(LiveServerTestCase):
@@ -22,7 +25,8 @@ class Register(LiveServerTestCase):
         return app
 
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        options = Options()
+        self.driver = webdriver.Firefox(firefox_options=options)
         self.driver.implicitly_wait(30)
         self.base_url = "https://www.katalon.com/"
         self.verificationErrors = []
