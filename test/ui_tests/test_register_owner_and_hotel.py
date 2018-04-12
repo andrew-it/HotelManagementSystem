@@ -14,12 +14,6 @@ class AddNewHotelOwner(LiveServerTestCase):
 
     def create_app(self):
         app = Flask(__name__)
-        app.config.update(
-            # Specify the test database
-            SQLALCHEMY_DATABASE_URI='mysql://dt_admin:dt2016@localhost/dreamteam_test',
-            # Change the port that the liveserver listens on
-            LIVESERVER_PORT=8943
-        )
         return app
 
     def setUp(self):
@@ -28,6 +22,14 @@ class AddNewHotelOwner(LiveServerTestCase):
         self.base_url = "https://www.katalon.com/"
         self.verificationErrors = []
         self.accept_next_alert = True
+
+    def test0_home_status_code(self):
+        # sends HTTP GET request to the application
+        # on the specified path
+        result = self.app.get('/')
+
+        # assert the status code of the response
+        self.assertEqual(result.status_code, 200)
 
     def test1_add_new_hotel_owner(self):
         AddNewHotelOwner.login_and_pass = str(int(time.time()))
