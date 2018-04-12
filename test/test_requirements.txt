@@ -26,3 +26,4 @@ wrapt==1.10.11
 Flask-Testing
 selenium
 nose-exclude
+nosexcover
