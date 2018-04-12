@@ -33,12 +33,14 @@ timestamps {
             }
 
             stage ('Run Tests'){
-                sh """
-                . venv/bin/activate
-                which python
+                wrap([$class: 'Xvfb', screen: '1440x900x24']) {
+                    sh """
+                    . venv/bin/activate
+                    which python
 
-                python -m nose --with-allure --logdir=./allure-results --with-coverage --cover-package app --cover-xml --cover-xml-file=allure-results/coverage.xml ./test
-                """
+                    python -m nose --with-allure --logdir=./allure-results --with-coverage --cover-package app --cover-xml --cover-xml-file=allure-results/coverage.xml ./test
+                    """
+                }
             }
 
             stage ('Run MyPy'){
