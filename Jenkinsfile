@@ -38,7 +38,7 @@ timestamps {
                     . venv/bin/activate
                     which python
 
-                    python -m nose --with-allure --logdir=./allure-results --with-coverage --cover-package app --cover-xml --cover-xml-file=allure-results/coverage.xml --exclude-dir=test/ui_tests ./test
+                    python -m nose --with-allure --logdir=./allure-results  --with-xcoverage --cover-package=app --xcoverage-file=allure-results/coverage.xml --exclude-dir=test/ui_tests ./test
                     """
                 }
             }
