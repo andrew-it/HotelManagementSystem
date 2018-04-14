@@ -1,6 +1,7 @@
 import time
 import unittest
 
+import allure
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
@@ -16,6 +17,7 @@ class Register(unittest.TestCase):
         self.verificationErrors = []
         self.accept_next_alert = True
 
+    @allure.step('Person registration')
     def test1_register(self):
         Register.login_and_pass = str(int(time.time()))
 
@@ -42,6 +44,7 @@ class Register(unittest.TestCase):
         driver.find_element_by_id("telephone").send_keys(Register.login_and_pass)
         driver.find_element_by_xpath("//button[@type='submit']").click()
 
+    @allure.step('Searching and booking a room')
     def test2_search_and_book(self):
         driver = self.driver
 
