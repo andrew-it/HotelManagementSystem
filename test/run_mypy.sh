@@ -1,0 +1,1 @@
+python -m mypy app --junit-xml test/result/mypy.xml || true
