@@ -1,20 +1,15 @@
 import time
 import unittest
 
-from flask import Flask
-from flask_testing import LiveServerTestCase
+import allure
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
 
 
-class AddNewHotelOwner(LiveServerTestCase):
+class AddNewHotelOwner(unittest.TestCase):
     login_and_pass = ''
-
-    def create_app(self):
-        app = Flask(__name__)
-        return app
 
     def setUp(self):
         self.driver = webdriver.Firefox()
@@ -23,14 +18,7 @@ class AddNewHotelOwner(LiveServerTestCase):
         self.verificationErrors = []
         self.accept_next_alert = True
 
-    def test0_home_status_code(self):
-        # sends HTTP GET request to the application
-        # on the specified path
-        result = self.app.get('/')
-
-        # assert the status code of the response
-        self.assertEqual(result.status_code, 200)
-
+    @allure.step('Hotel\'s owner registration')
     def test1_add_new_hotel_owner(self):
         AddNewHotelOwner.login_and_pass = str(int(time.time()))
 
@@ -57,6 +45,7 @@ class AddNewHotelOwner(LiveServerTestCase):
         driver.find_element_by_id("telephone").send_keys(AddNewHotelOwner.login_and_pass)
         driver.find_element_by_xpath("//button[@type='submit']").click()
 
+    @allure.step('New hotel adding')
     def test2_add_new_hotel(self):
         driver = self.driver
 

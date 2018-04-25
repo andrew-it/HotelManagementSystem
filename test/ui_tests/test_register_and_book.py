@@ -1,38 +1,23 @@
 import time
 import unittest
 
-from flask_testing import LiveServerTestCase
-
+import allure
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.firefox.options import Options
 
 
-
-class Register(LiveServerTestCase):
+class Register(unittest.TestCase):
     login_and_pass = ''
 
-    def create_app(self):
-        app = Flask(__name__)
-        return app
-
     def setUp(self):
-        options = Options()
-        self.driver = webdriver.Firefox(firefox_options=options)
+        self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
         self.base_url = "https://www.katalon.com/"
         self.verificationErrors = []
         self.accept_next_alert = True
 
-    def test0_home_status_code(self):
-        # sends HTTP GET request to the application
-        # on the specified path
-        result = self.app.get('/')
-
-        # assert the status code of the response
-        self.assertEqual(result.status_code, 200)
-
+    @allure.step('Person registration')
     def test1_register(self):
         Register.login_and_pass = str(int(time.time()))
 
@@ -59,6 +44,7 @@ class Register(LiveServerTestCase):
         driver.find_element_by_id("telephone").send_keys(Register.login_and_pass)
         driver.find_element_by_xpath("//button[@type='submit']").click()
 
+    @allure.step('Searching and booking a room')
     def test2_search_and_book(self):
         driver = self.driver
 
