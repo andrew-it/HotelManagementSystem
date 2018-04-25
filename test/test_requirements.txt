@@ -27,3 +27,4 @@ Flask-Testing
 selenium
 nose-exclude
 nosexcover
+requests==2.18.4
