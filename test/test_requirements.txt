@@ -24,3 +24,6 @@ six==1.11.0
 typed-ast==1.1.0
 wrapt==1.10.11
 Flask-Testing
+selenium
+nose-exclude
+nosexcover
