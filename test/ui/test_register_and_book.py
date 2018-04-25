@@ -1,7 +1,6 @@
 import time
 import unittest
 
-import allure
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
@@ -17,7 +16,6 @@ class Register(unittest.TestCase):
         self.verificationErrors = []
         self.accept_next_alert = True
 
-    @allure.step('Person registration')
     def test1_register(self):
         Register.login_and_pass = str(int(time.time()))
 

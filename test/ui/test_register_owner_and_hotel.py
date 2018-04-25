@@ -1,7 +1,6 @@
 import time
 import unittest
 
-import allure
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
@@ -18,7 +17,6 @@ class AddNewHotelOwner(unittest.TestCase):
         self.verificationErrors = []
         self.accept_next_alert = True
 
-    @allure.step('Hotel\'s owner registration')
     def test1_add_new_hotel_owner(self):
         AddNewHotelOwner.login_and_pass = str(int(time.time()))
 
