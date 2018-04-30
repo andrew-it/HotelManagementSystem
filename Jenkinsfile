@@ -24,4 +24,8 @@ node {
      stage("Coverage report"){
             cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'test/result/coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '20, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
      }
+
+     stage("Performance report"){
+            perfReport percentiles: '0,50,90,100', sourceDataFiles: 'test/result/*.wrk'
+     }
 }
