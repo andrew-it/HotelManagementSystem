@@ -648,25 +648,13 @@ def manageHotel(hotel_id):
 @app.route('/my-booking', methods=['GET', 'POST'])
 @login_required
 def myBooking():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     form = DBookingForm()
     today = datetime.datetime.now().date()
     if form.validate_on_submit():
-        try:
-            cur.execute("DELETE FROM transaction WHERE transaction_id=%s", (form.transaction_id.data,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        flash("Reservation has been cancelled")
-    try:
-        cur.execute(
-            "SELECT *, b.quantity as booked FROM booking b INNER JOIN transaction t ON (b.transaction_id=t.transaction_id) INNER JOIN room r ON (b.room_id=r.room_id) INNER JOIN room_option ro ON (r.option_id=ro.option_id) INNER JOIN hotel h ON (h.hotel_id=r.hotel_id) INNER JOIN country c ON (h.city=c.city) WHERE b.customer_id=%s",
-            (current_user.get_id(),))
-        g.db.commit()
-    except Exception as e:
-        print(e)
-    info = cur.fetchall()
+        if not db.delete_transaction(form.transaction_id.data):
+            flash("Reservation has been cancelled")
+    info = db.get_some_info_by_user_id(current_user.get_id())
     return render_template('my_booking.html', form=form, info=info, today=today)
 
 
