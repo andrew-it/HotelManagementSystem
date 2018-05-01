@@ -675,16 +675,12 @@ def manageBooking():
     g.db = connectToDB()
     cur = g.db.cursor(cursor_factory=dictCursor)
     if 'recep' not in session:
-        cur.execute("SELECT * FROM receptionist WHERE person_id=%s", (current_user.user_id,))
-        session['recep'] = dict(cur.fetchone())
+        session['recep'] = AndrewDB.get_all_receptionists(current_user.user_id)
     if 'hotel' not in session:
-        cur.execute("SELECT * FROM vw_hotels WHERE hotel_id=%s", (session['recep']['hotel_id'],))
-        session['hotel'] = dict(cur.fetchone())
+        session['hotel'] = AndrewDB.get_vw_hotel_by_id(session['recep']['hotel_id'])
     recep = session['recep']
     hotel = session['hotel']
-    cur.execute("SELECT * FROM vw_booked_rooms WHERE hotel_id=%s", (recep['hotel_id'],))
-    g.db.commit()
-    bookings = cur.fetchall()
+    bookings = AndrewDB.get_booked_rooms_by_hotel_id(recep['hotel_id'])
     return render_template('booked_rooms.html', bookings=bookings, hotel=hotel)
 
 

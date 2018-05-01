@@ -42,7 +42,7 @@ class AndrewDB(Database):
             cur = self.__get_cursor(self.ROLE_ADMIN)
             cur.execute(
                 "INSERT INTO admin (person_id, first_name, last_name, phone_number) VALUES (%s, %s, %s, %s);",
-                (user_id, f_name l_name, phone_number))
+                (user_id, f_name, l_name, phone_number))
             g.db.commit()
         except Exception as e:
             print(e)
@@ -70,11 +70,32 @@ class AndrewDB(Database):
 
     def get_rooms_by_params(self, recep, checkin_date, chechout_date):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
-        query = "SELECT * FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) INNER JOIN room_option ro ON (r.option_id=ro.option_id) WHERE r.hotel_id=%s AND r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%s <= b.checkin_date OR %s >= b.checkout_date))"
+        query = "SELECT * " \
+                "FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) " \
+                "INNER JOIN room_option ro ON (r.option_id=ro.option_id) " \
+                "WHERE r.hotel_id=%s AND r.quantity > " \
+                "(SELECT coalesce(MAX(b.quantity), 0) FROM booking b " \
+                "WHERE r.room_id = b.room_id AND NOT (%s <= b.checkin_date OR %s >= b.checkout_date))"
         cur.execute(query, (recep, checkin_date, chechout_date))
         rooms = cur.fetchall()
         g.db.commit()
         return rooms
+
+    def get_all_receptionists(self, user_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM receptionist WHERE person_id=%s", (user_id,))
+        return dict(cur.fetchone())
+
+    def get_vw_hotel_by_id(self, hotel_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM vw_hotels WHERE hotel_id=%s", (hotel_id,))
+        return dict(cur.fetchone())
+
+    def get_booked_rooms_by_hotel_id(self, hotel_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM vw_booked_rooms WHERE hotel_id=%s", (hotel_id,))
+        g.db.commit()
+        return cur.fetchall()
 
 
 class PostgresDatabase(Database):
