@@ -129,6 +129,10 @@ class AndrewDB(Database):
             print(e)
         return None
 
+    def get_cost_by_id(self, id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT cost FROM room WHERE room_id=%s", (id,))
+        return cur.fetchone()['cost']
 
 class PostgresDatabase(Database):
     def method(self):
