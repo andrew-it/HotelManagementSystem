@@ -131,21 +131,14 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     form = LoginForm()
     if form.validate_on_submit():
-        try:
-            cur.execute("SELECT * FROM sys_user WHERE email=%s;",
-                        (form.email.data,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        res = cur.fetchone()
-        if not res or not bcrypt.check_password_hash(res['password'], form.password.data):
+        sys_user = db.get_sys_user_by_email(form.email.data)
+        if not sys_user or not bcrypt.check_password_hash(sys_user['password'], form.password.data):
             flash('Email Address or Password is invalid')
             return redirect(url_for('login'))
-        user = User(res['user_id'], res['email'], res['password'], res['role'])
+        user = User(sys_user['user_id'], sys_user['email'], sys_user['password'], sys_user['role'])
         if form.remember_me.data:
             login_user(user, remember=True)
         else:

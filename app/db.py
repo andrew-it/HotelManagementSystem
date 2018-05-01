@@ -46,6 +46,15 @@ class AndrewDB(Database):
             g.db.rollback()
             return None
 
+    def get_sys_user_by_email(self, email):
+        try:
+            cur = self.__get_cursor(self.ROLE_ADMIN)
+            cur.execute("SELECT * FROM sys_user WHERE email=%s;", (email,))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        return cur.fetchone()
+
     def insert_admin(self, user_id: str, f_name: str, l_name: str, phone_number: str) -> None:
         try:
             cur = self.__get_cursor(self.ROLE_ADMIN)
