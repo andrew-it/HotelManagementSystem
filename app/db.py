@@ -97,6 +97,28 @@ class AndrewDB(Database):
         g.db.commit()
         return dict(cur.fetchone())
 
+    def get_hotel_by_id(self, hotel_id):
+        try:
+            cur = self.__get_cursor(self.ROLE_CUSTOMER)
+            cur.execute("SELECT * FROM hotel WHERE hotel_id=%s;", (hotel_id,))
+            g.db.commit()
+            return cur.fetchone()
+        except Exception as e:
+            print(e)
+            return None
+
+    def get_rooms_with_settings_by_id(self, hotel_id):
+        try:
+            cur = self.__get_cursor(self.ROLE_CUSTOMER)
+            cur.execute(
+                "SELECT * FROM room r, room_config rc, room_option ro "
+                "WHERE r.hotel_id=%s AND r.config_id=rc.config_id AND r.option_id=ro.option_id;",
+                (hotel_id,))
+            return cur.fetchall()
+        except Exception as e:
+            print(e)
+            return None
+
     def get_booked_rooms_by_hotel_id(self, hotel_id):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
         cur.execute("SELECT * FROM vw_booked_rooms WHERE hotel_id=%s", (hotel_id,))
@@ -129,6 +151,132 @@ class AndrewDB(Database):
             print(e)
         return None
 
+    def get_option_by_params(self, is_bath, is_tv, is_wifi, is_bathh, is_air):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute(
+                "SELECT option_id FROM room_option "
+                "WHERE is_bathroom=%s AND is_tv=%s AND is_wifi=%s AND is_bathhub=%s AND is_airconditioniring=%s;",
+                (is_bath, is_tv, is_wifi, is_bathh, is_air))
+            g.db.commit()
+            return cur.fetchone()
+        except Exception as e:
+            print(e)
+            return None
+
+    def insert_option(self, is_bath, is_tv, is_wifi, is_bathh, is_air):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute(
+                "INSERT INTO room_option (is_bathroom, is_tv, is_wifi, is_bathhub, is_airconditioniring) "
+                "VALUES (%s, %s, %s, %s, %s) RETURNING option_id;",
+                (is_bath, is_tv, is_wifi, is_bathh, is_air))
+            g.db.commit()
+            return cur.fetchone()['option_id']
+        except Exception as e:
+            print(e)
+            return None
+
+    def delete_room_by_id(self, room_id) -> bool:
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute("DELETE FROM room WHERE room_id=%s;", (room_id,))
+            g.db.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def select_config(self, single_bed, souble_bed, sofa_bed):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute(
+                "SELECT config_id FROM room_config WHERE single_bed=%s AND double_bed=%s AND sofa_bed=%s;",
+                (single_bed, souble_bed, sofa_bed))
+            g.db.commit()
+            return cur.fetchone()
+        except Exception as e:
+            print(e)
+            return None
+
+    def insert_config(self, single_bed, souble_bed, sofa_bed):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute(
+                "INSERT INTO room_config (single_bed, double_bed, sofa_bed) VALUES (%s, %s, %s) RETURNING config_id;",
+                (single_bed, souble_bed, sofa_bed))
+            g.db.commit()
+            return cur.fetchone()['config_id']
+        except Exception as e:
+            print(e)
+            return None
+
+    def set_up_room_by_id(self, config_id, option_id, quantity, title, description, cost, room_id):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute(
+                "UPDATE room SET (config_id, option_id, quantity, title, description, cost)=(%s, %s, %s, %s, %s, %s) "
+                "WHERE room_id=%s;",
+                (config_id, option_id, quantity, title, description, cost, room_id))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+
+    def delete_receptionist_by_id(self, recep_id) -> bool:
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute("DELETE FROM sys_user WHERE user_id=%s;", (recep_id,))
+            g.db.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def insert_user(self, email, password, role):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING user_id;",
+                        (email, password, role))
+            g.db.commit()
+            return cur.fetchone()['user_id']
+        except psycopg2.IntegrityError:
+            g.db.rollback()
+            return None
+
+    def add_new_receptionist(self, user_id, hotel_id, f_name, l_name, phone) -> bool:
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute(
+                "INSERT INTO receptionist (person_id, hotel_id, first_name, last_name, phone_number, salary) "
+                "VALUES (%s, %s, %s, %s, %s, %s);",
+                (user_id, hotel_id, f_name, l_name, phone))
+            g.db.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def add_new_room(self, hotel_id, config_id, option_id, quantity, title, descr, cost):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute(
+                "INSERT INTO room (hotel_id, config_id, option_id, quantity, title, description, cost) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s);",
+                (hotel_id, config_id, option_id, quantity, title, descr, cost))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+
+    def get_receptionists_by_hotel_id(self, hotel_id):
+        try:
+            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
+            cur.execute("SELECT * FROM sys_user u, receptionist r WHERE u.user_id=r.person_id AND r.hotel_id=%s;",
+                        (hotel_id,))
+            g.db.commit()
+            return cur.fetchall()
+        except Exception as e:
+            print(e)
+            return None
 
 class PostgresDatabase(Database):
     def method(self):

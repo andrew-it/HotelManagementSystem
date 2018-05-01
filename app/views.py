@@ -463,8 +463,7 @@ def editHotel(hotel_id):
 @app.route('/manage-hotel/<int:hotel_id>', methods=['GET', 'POST'])
 @login_required
 def manageHotel(hotel_id):
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     g.role = 'receptionist'
     recForm = CReceptionistForm()
     roomForm = CRoomForm()
@@ -473,171 +472,72 @@ def manageHotel(hotel_id):
     form3 = DReceptionistForm()
     if current_user.is_hotel_admin():
         if form.delete.data:
-            try:
-                cur.execute("DELETE FROM room WHERE room_id=%s;", (form.room_id.data,))
-                g.db.commit()
-            except Exception as e:
-                print(e)
-            flash('Room was removed')
+            if db.delete_room_by_id(form.room_id.data):
+                flash('Room was removed')
             return redirect(url_for('manageHotel', hotel_id=hotel_id))
+
         if form2.edit.data:
             if form2.validate_on_submit():
                 option_id = None
                 config_id = None
-                try:
-                    cur.execute(
-                        "SELECT option_id FROM room_option WHERE is_bathroom=%s AND is_tv=%s AND is_wifi=%s AND is_bathhub=%s AND is_airconditioniring=%s;",
-                        (form2.is_bathroom.data, form2.is_tv.data, form2.is_wifi.data, form2.is_bathhub.data,
-                         form2.is_aircond.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                res = cur.fetchone()
+                res = db.get_option_by_params(form2.is_bathroom.data, form2.is_tv.data, form2.is_wifi.data,
+                                              form2.is_bathhub.data, form2.is_aircond.data)
                 if not res:
-                    try:
-                        cur.execute(
-                            "INSERT INTO room_option (is_bathroom, is_tv, is_wifi, is_bathhub, is_airconditioniring) VALUES (%s, %s, %s, %s, %s) RETURNING option_id;",
-                            (form2.is_bathroom.data, form2.is_tv.data, form2.is_wifi.data, form2.is_bathhub.data,
-                             form2.is_aircond.data))
-                        g.db.commit()
-                    except Exception as e:
-                        print(e)
-                    option_id = cur.fetchone()['option_id']
+                    option_id = db.insert_option(form2.is_bathroom.data, form2.is_tv.data, form2.is_wifi.data,
+                                                 form2.is_bathhub.data, form2.is_aircond.data)
                 else:
                     option_id = res['option_id']
-                try:
-                    cur.execute(
-                        "SELECT config_id FROM room_config WHERE single_bed=%s AND double_bed=%s AND sofa_bed=%s;",
-                        (form2.sing_bed.data, form2.doub_bed.data, form2.sofa_bed.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                res = cur.fetchone()
+                res = db.select_config(form2.sing_bed.data, form2.doub_bed.data, form2.sofa_bed.data)
                 if not res:
-                    try:
-                        cur.execute(
-                            "INSERT INTO room_config (single_bed, double_bed, sofa_bed) VALUES (%s, %s, %s) RETURNING config_id;",
-                            (form2.sing_bed.data, form2.doub_bed.data, form2.sofa_bed.data))
-                        g.db.commit()
-                    except Exception as e:
-                        print(e)
-                    config_id = cur.fetchone()['config_id']
+                    config_id = db.insert_config(form2.sing_bed.data, form2.doub_bed.data, form2.sofa_bed.data)
                 else:
                     config_id = res['config_id']
-                try:
-                    cur.execute(
-                        "UPDATE room SET (config_id, option_id, quantity, title, description, cost)=(%s, %s, %s, %s, %s, %s) WHERE room_id=%s;",
-                        (config_id, option_id, form2.quantity.data, form2.title.data, form2.description.data,
-                         form2.cost.data, form2.room_id.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
+                db.set_up_room_by_id(config_id, option_id, form2.quantity.data, form2.title.data,
+                                     form2.description.data, form2.cost.data, form2.room_id.data)
+
         if form3.del_rec.data:
-            try:
-                cur.execute("DELETE FROM sys_user WHERE user_id=%s;", (form3.user_id.data,))
-                g.db.commit()
-            except Exception as e:
-                print(e)
-            flash("Receptionist was removed")
+            if db.delete_receptionist_by_id(form3.user_id.data):
+                flash("Receptionist was removed")
+
         if recForm.save.data:
             if recForm.validate_on_submit():
-                try:
-                    hash_password = bcrypt.generate_password_hash(recForm.password.data).decode('utf-8')
-                    cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING user_id;",
-                                (recForm.email.data, hash_password, g.role))
-                    g.db.commit()
-                except psycopg2.IntegrityError:
-                    g.db.rollback()
+                hash_password = bcrypt.generate_password_hash(recForm.password.data).decode('utf-8')
+                user_id = db.insert_user(recForm.email.data, hash_password, g.role)
+                if user_id:
                     flash('User with this email already registered')
-                    return redirect(url_for('manageHotel', hotel_id=hotel_id))
-                user_id = cur.fetchone()['user_id']
-                try:
-                    cur.execute(
-                        "INSERT INTO receptionist (person_id, hotel_id, first_name, last_name, phone_number, salary) VALUES (%s, %s, %s, %s, %s, %s);",
-                        (user_id, hotel_id, recForm.first_name.data, recForm.last_name.data, recForm.telephone.data,
-                         recForm.salary.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                flash("Receptionist was added")
+                else:
+                    redirect(url_for('manageHotel', hotel_id=hotel_id))
+                if db.add_new_receptionist(user_id, hotel_id, recForm.first_name.data, recForm.last_name.data,
+                                           recForm.telephone.data, recForm.salary.data):
+                    flash("Receptionist was added")
                 return redirect(url_for('manageHotel', hotel_id=hotel_id))
+
         if roomForm.save.data:
             if roomForm.validate_on_submit():
                 option_id = None
                 config_id = None
-                try:
-                    cur.execute(
-                        "SELECT option_id FROM room_option WHERE is_bathroom=%s AND is_tv=%s AND is_wifi=%s AND is_bathhub=%s AND is_airconditioniring=%s;",
-                        (
-                            roomForm.is_bathroom.data, roomForm.is_tv.data, roomForm.is_wifi.data,
-                            roomForm.is_bathhub.data,
-                            roomForm.is_aircond.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                res = cur.fetchone()
+
+                res = db.get_option_by_params(roomForm.is_bathroom.data, roomForm.is_tv.data, roomForm.is_wifi.data,
+                                              roomForm.is_bathhub.data, roomForm.is_aircond.data)
                 if not res:
-                    try:
-                        cur.execute(
-                            "INSERT INTO room_option (is_bathroom, is_tv, is_wifi, is_bathhub, is_airconditioniring) VALUES (%s, %s, %s, %s, %s) RETURNING option_id;",
-                            (roomForm.is_bathroom.data, roomForm.is_tv.data, roomForm.is_wifi.data,
-                             roomForm.is_bathhub.data, roomForm.is_aircond.data))
-                        g.db.commit()
-                    except Exception as e:
-                        print(e)
-                    option_id = cur.fetchone()['option_id']
+                    option_id = db.insert_option(roomForm.is_bathroom.data, roomForm.is_tv.data, roomForm.is_wifi.data,
+                                                 roomForm.is_bathhub.data, roomForm.is_aircond.data)
                 else:
                     option_id = res['option_id']
-                try:
-                    cur.execute(
-                        "SELECT config_id FROM room_config WHERE single_bed=%s AND double_bed=%s AND sofa_bed=%s;",
-                        (roomForm.sing_bed.data, roomForm.doub_bed.data, roomForm.sofa_bed.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                res = cur.fetchone()
+
+                res = db.select_config(roomForm.sing_bed.data, roomForm.doub_bed.data, roomForm.sofa_bed.data)
                 if not res:
-                    try:
-                        cur.execute(
-                            "INSERT INTO room_config (single_bed, double_bed, sofa_bed) VALUES (%s, %s, %s) RETURNING config_id;",
-                            (roomForm.sing_bed.data, roomForm.doub_bed.data, roomForm.sofa_bed.data))
-                        g.db.commit()
-                    except Exception as e:
-                        print(e)
-                    config_id = cur.fetchone()['config_id']
+                    config_id = db.insert_config(roomForm.sing_bed.data, roomForm.doub_bed.data, roomForm.sofa_bed.data)
                 else:
                     config_id = res['config_id']
-                try:
-                    cur.execute(
-                        "INSERT INTO room (hotel_id, config_id, option_id, quantity, title, description, cost) VALUES (%s, %s, %s, %s, %s, %s, %s);",
-                        (hotel_id, config_id, option_id, roomForm.quantity.data, roomForm.title.data,
-                         roomForm.description.data, roomForm.cost.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
+                db.add_new_room(hotel_id, config_id, option_id, roomForm.quantity.data, roomForm.title.data,
+                                roomForm.description.data, roomForm.cost.data)
                 flash('Room was added')
                 return redirect(url_for('manageHotel', hotel_id=hotel_id))
-        try:
-            cur.execute("SELECT * FROM hotel WHERE hotel_id=%s;", (hotel_id,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        hotel = cur.fetchone()
-        try:
-            cur.execute(
-                "SELECT * FROM room r, room_config rc, room_option ro WHERE r.hotel_id=%s AND r.config_id=rc.config_id AND r.option_id=ro.option_id;",
-                (hotel_id,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        rooms = cur.fetchall()
-        try:
-            cur.execute("SELECT * FROM sys_user u, receptionist r WHERE u.user_id=r.person_id AND r.hotel_id=%s;",
-                        (hotel_id,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        recep = cur.fetchall()
+        hotel = db.get_hotel_by_id(hotel_id)
+        rooms = db.get_rooms_with_settings_by_id(hotel_id)
+        recep = db.get_receptionists_by_hotel_id(hotel_id)
+
         return render_template('manage_hotel.html', recForm=recForm, roomForm=roomForm, form=form, form2=form2,
                                form3=form3, hotel=hotel, rooms=rooms, recep=recep)
     else:
@@ -687,6 +587,7 @@ def newBooking():
 def admin():
     form = CAdmin()
     db = AndrewDB()
+    g.role = 'admin'
     if request.method == 'POST' and form.validate_on_submit():
         hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user_id = db.insert_sys_user(form.email.data, hash_password)
