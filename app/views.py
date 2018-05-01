@@ -8,6 +8,7 @@ from flask import flash, g, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app import app, bcrypt, login_manager
+from app.db import AndrewDB
 from .forms import CAdmin, CReceptionistForm, CRoomForm, CUHotelForm, DBookingForm, DReceptionistForm, InfoForm, \
     LoginForm, ProfileForm, RegisterForm, ReserveRoomForm, SearchForm, UDHotelForm, UDRoomForm, URoomForm
 from .models import Customer, HotelAdmin, User
@@ -387,8 +388,9 @@ def addHotel():
                     cur.execute(
                         "INSERT INTO hotel (city, address, name, stars, description, owner_id, img) VALUES (%s, %s, %s, %s, %s, %s, %s);",
                         (
-                        form.city.data, form.address.data, form.hotel_name.data, form.stars.data, form.description.data,
-                        current_user.user_id, img_path))
+                            form.city.data, form.address.data, form.hotel_name.data, form.stars.data,
+                            form.description.data,
+                            current_user.user_id, img_path))
                     g.db.commit()
                 except Exception as e:
                     print(e)
@@ -437,8 +439,9 @@ def editHotel(hotel_id):
                     cur.execute(
                         "UPDATE hotel SET (city, address, name, stars, description, img)=(%s, %s, %s, %s, %s, %s) WHERE hotel_id=%s;",
                         (
-                        form.city.data, form.address.data, form.hotel_name.data, form.stars.data, form.description.data,
-                        img_path, hotel_id))
+                            form.city.data, form.address.data, form.hotel_name.data, form.stars.data,
+                            form.description.data,
+                            img_path, hotel_id))
                     g.db.commit()
                 except Exception as e:
                     print(e)
@@ -566,8 +569,9 @@ def manageHotel(hotel_id):
                     cur.execute(
                         "SELECT option_id FROM room_option WHERE is_bathroom=%s AND is_tv=%s AND is_wifi=%s AND is_bathhub=%s AND is_airconditioniring=%s;",
                         (
-                        roomForm.is_bathroom.data, roomForm.is_tv.data, roomForm.is_wifi.data, roomForm.is_bathhub.data,
-                        roomForm.is_aircond.data))
+                            roomForm.is_bathroom.data, roomForm.is_tv.data, roomForm.is_wifi.data,
+                            roomForm.is_bathhub.data,
+                            roomForm.is_aircond.data))
                     g.db.commit()
                 except Exception as e:
                     print(e)
@@ -687,54 +691,29 @@ def manageBooking():
 @app.route('/new-booking', methods=['GET', 'POST'])
 @login_required
 def newBooking():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
     recep = session['recep']
     hotel = session['hotel']
     today = datetime.datetime.now().date().strftime("%Y-%m-%d")
-    query = "SELECT * FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) INNER JOIN room_option ro ON (r.option_id=ro.option_id) WHERE r.hotel_id=%s AND r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%s <= b.checkin_date OR %s >= b.checkout_date))"
-    cur.execute(query, (recep['hotel_id'], today, today))
-    rooms = cur.fetchall()
-    g.db.commit()
+    rooms = AndrewDB.get_rooms_by_params(recep['hotel_id'], today, today)
     return render_template('new_booking.html', rooms=rooms, hotel=hotel)
 
 
 @app.route('/admin-panel', methods=['GET', 'POST'])
 @login_required
 def admin():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
-    g.role = 'admin'
     form = CAdmin()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            try:
-                hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-                cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING user_id;",
-                            (form.email.data, hash_password, g.role))
-                g.db.commit()
-            except psycopg2.IntegrityError:
-                g.db.rollback()
-                flash('User with this email already registered')
-                return redirect(url_for('admin'))
-            user_id = cur.fetchone()['user_id']
-            try:
-                cur.execute(
-                    "INSERT INTO admin (person_id, first_name, last_name, phone_number) VALUES (%s, %s, %s, %s);",
-                    (user_id, form.first_name.data, form.last_name.data, form.telephone.data))
-                g.db.commit()
-            except Exception as e:
-                print(e)
-            flash("Admin was added")
+    if request.method == 'POST' and form.validate_on_submit():
+        hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user_id = AndrewDB.insert_sys_user(form.email.data, hash_password)
+        if user_id is None:
+            flash('User with this email already registered')
             return redirect(url_for('admin'))
-    cur.execute("SELECT COUNT(*) as hotels FROM hotel")
-    hotels = cur.fetchone()['hotels']
-    cur.execute("SELECT COUNT(*) as users FROM sys_user")
-    users = cur.fetchone()['users']
-    cur.execute(
-        "SELECT blks_hit::float/(blks_read + blks_hit) as cache_hit_ratio, numbackends FROM pg_stat_database WHERE datname='hms'")
-    db_stat = dict(cur.fetchall()[0])
-    cur.execute("SELECT * FROM admin NATURAL JOIN sys_user WHERE role='admin'")
-    admins = cur.fetchall()
+        AndrewDB.insert_admin(user_id, form.first_name.data, form.last_name.data, form.telephone.data)
+        flash("Admin was added")
+        return redirect(url_for('admin'))
+    hotels = AndrewDB.get_all_hotels()
+    users = AndrewDB.get_all_system_users()
+    db_stat = AndrewDB.get_db_statistics()
+    admins = AndrewDB.get_all_admins()
     g.db.commit()
     return render_template('admin_panel.html', hotels=hotels, users=users, db_stat=db_stat, form=form, admins=admins)
