@@ -1,8 +1,6 @@
 import psycopg2
 from flask import g
 
-from app import bcrypt
-
 
 def searchOp(args):
     d = ['is_bathroom', 'is_tv', 'is_wifi', 'is_bathhub', 'is_airconditioniring']
@@ -135,7 +133,7 @@ class AndrewDB(Database):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
         cur.execute("SELECT * FROM customers WHERE person_id=%s", (person_id,))
         g.db.commit()
-        res = dict(cur.fetchone())
+        return dict(cur.fetchone())
 
     def get_hotel_admin_by_id(self, person_id):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
