@@ -672,25 +672,25 @@ def myBooking():
 
 @app.route('/manage-booking', methods=['GET', 'POST'])
 def manageBooking():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     if 'recep' not in session:
-        session['recep'] = AndrewDB.get_all_receptionists(current_user.user_id)
+        session['recep'] = db.get_all_receptionists(current_user.user_id)
     if 'hotel' not in session:
-        session['hotel'] = AndrewDB.get_vw_hotel_by_id(session['recep']['hotel_id'])
+        session['hotel'] = db.get_vw_hotel_by_id(session['recep']['hotel_id'])
     recep = session['recep']
     hotel = session['hotel']
-    bookings = AndrewDB.get_booked_rooms_by_hotel_id(recep['hotel_id'])
+    bookings = db.get_booked_rooms_by_hotel_id(recep['hotel_id'])
     return render_template('booked_rooms.html', bookings=bookings, hotel=hotel)
 
 
 @app.route('/new-booking', methods=['GET', 'POST'])
 @login_required
 def newBooking():
+    db = AndrewDB()
     recep = session['recep']
     hotel = session['hotel']
     today = datetime.datetime.now().date().strftime("%Y-%m-%d")
-    rooms = AndrewDB.get_rooms_by_params(recep['hotel_id'], today, today)
+    rooms = db.get_rooms_by_params(recep['hotel_id'], today, today)
     return render_template('new_booking.html', rooms=rooms, hotel=hotel)
 
 
@@ -698,18 +698,19 @@ def newBooking():
 @login_required
 def admin():
     form = CAdmin()
+    db = AndrewDB()
     if request.method == 'POST' and form.validate_on_submit():
         hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user_id = AndrewDB.insert_sys_user(form.email.data, hash_password)
+        user_id = db.insert_sys_user(form.email.data, hash_password)
         if user_id is None:
             flash('User with this email already registered')
             return redirect(url_for('admin'))
-        AndrewDB.insert_admin(user_id, form.first_name.data, form.last_name.data, form.telephone.data)
+        db.insert_admin(user_id, form.first_name.data, form.last_name.data, form.telephone.data)
         flash("Admin was added")
         return redirect(url_for('admin'))
-    hotels = AndrewDB.get_all_hotels()
-    users = AndrewDB.get_all_system_users()
-    db_stat = AndrewDB.get_db_statistics()
-    admins = AndrewDB.get_all_admins()
+    hotels = db.get_all_hotels()
+    users = db.get_all_system_users()
+    db_stat = db.get_db_statistics()
+    admins = db.get_all_admins()
     g.db.commit()
     return render_template('admin_panel.html', hotels=hotels, users=users, db_stat=db_stat, form=form, admins=admins)
