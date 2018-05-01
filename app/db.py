@@ -277,6 +277,7 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
             return None
+
     def get_cost_by_id(self, id):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
         cur.execute("SELECT cost FROM room WHERE room_id=%s", (id,))
@@ -290,6 +291,7 @@ class AndrewDB(Database):
             info)
         g.db.commit()
         return cur.fetchone()['transaction_id']
+
 
 class PostgresDatabase(Database):
     def method(self):
