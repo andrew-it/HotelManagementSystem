@@ -38,7 +38,7 @@ def test_user_status():
     with nose.allure.step('Check that a user is authenticated'):
         assert (user.is_authenticated())
 
-    with nose.allure.step('Check that a user is not anonymous'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not anonymous'):
         assert (not user.is_anonymous())
 
 
@@ -48,10 +48,10 @@ def test_anonymous_user_status():
     with nose.allure.step('Initialize user'):
         user = AnonymousUser()
 
-    with nose.allure.step('Check that a user is not active'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not active'):
         assert (not user.is_active())
 
-    with nose.allure.step('Check that a user is not authenticated'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not authenticated'):
         assert (not user.is_authenticated())
 
     with nose.allure.step('Check that a user is anonymous'):
@@ -70,13 +70,13 @@ def test_customer_role():
     with nose.allure.step('Check that a user is a customer'):
         assert (user.is_customer())
 
-    with nose.allure.step('Check that a user is not an admin'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not an admin'):
         assert (not user.is_admin())
 
-    with nose.allure.step('Check that a user is not a hotel admin'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a hotel admin'):
         assert (not user.is_hotel_admin())
 
-    with nose.allure.step('Check that a user is not a receptionist'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a receptionist'):
         assert (not user.is_receptionist())
 
 
@@ -86,16 +86,16 @@ def test_hotel_admin_role():
     with nose.allure.step('Initialize user'):
         user = create_user("hotel_admin")
 
-    with nose.allure.step('Check that a user is not a customer'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a customer'):
         assert (not user.is_customer())
 
-    with nose.allure.step('Check that a user is not an admin'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not an admin'):
         assert (not user.is_admin())
 
     with nose.allure.step('Check that a user is a hotel admin'):
         assert (user.is_hotel_admin())
 
-    with nose.allure.step('Check that a user is not a receptionist'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a receptionist'):
         assert (not user.is_receptionist())
 
 
@@ -105,16 +105,16 @@ def test_admin_role():
     with nose.allure.step('Initialize user'):
         user = create_user("admin")
 
-    with nose.allure.step('Check that a user is not a customer'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a customer'):
         assert (not user.is_customer())
 
     with nose.allure.step('Check that a user is an admin'):
         assert (user.is_admin())
 
-    with nose.allure.step('Check that a user is not a hotel admin'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a hotel admin'):
         assert (not user.is_hotel_admin())
 
-    with nose.allure.step('Check that a user is not a receptionist'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a receptionist'):
         assert (not user.is_receptionist())
 
 
@@ -124,13 +124,13 @@ def test_receptionist_role():
     with nose.allure.step('Initialize user'):
         user = create_user("receptionist")
 
-    with nose.allure.step('Check that a user is not a customer'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a customer'):
         assert (not user.is_customer())
 
-    with nose.allure.step('Check that a user is not an admin'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not an admin'):
         assert (not user.is_admin())
 
-    with nose.allure.step('Check that a user is not a hotel admin'):
+    with nose.allure.step('[NEGATIVE] Check that a user is not a hotel admin'):
         assert (not user.is_hotel_admin())
 
     with nose.allure.step('Check that a user is a receptionist'):
@@ -139,7 +139,7 @@ def test_receptionist_role():
 
 @nose.allure.feature('Role')
 def test_broken_role():
-    """Check role-determining methods for a user with an invalid role"""
+    """[NEGATIVE] Check role-determining methods for a user with an invalid role"""
     with nose.allure.step('Initialize user'):
         user = create_user()
 
@@ -158,7 +158,7 @@ def test_broken_role():
 
 @nose.allure.feature('Role')
 def test_anonymous_user_role():
-    """Check role-determining methods for an anonymous user"""
+    """[NEGATIVE] Check role-determining methods for an anonymous user"""
     with nose.allure.step('Initialize user'):
         user = create_user()
 
