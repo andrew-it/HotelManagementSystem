@@ -277,6 +277,19 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
             return None
+    def get_cost_by_id(self, id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT cost FROM room WHERE room_id=%s", (id,))
+        g.db.commit()
+        return cur.fetchone()['cost']
+
+    def create_transaction_get_id(self, info):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute(
+            "INSERT INTO transaction VALUES (DEFAULT, %(customer_id)s, %(payment_info)s, %(amount)s) RETURNING transaction_id;",
+            info)
+        g.db.commit()
+        return cur.fetchone()['transaction_id']
 
 class PostgresDatabase(Database):
     def method(self):

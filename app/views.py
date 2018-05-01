@@ -91,8 +91,7 @@ def searchHotel():
 
 @app.route('/more-info/<int:hotel_id>', methods=['GET', 'POST'])
 def moreInfo(hotel_id):
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    db = AndrewDB()
     form = ReserveRoomForm()
     search = session['search']
     search['hotel_id'] = hotel_id
@@ -104,13 +103,9 @@ def moreInfo(hotel_id):
         nights = (checkout - checkin).days
         g.db = connectToDB()
         cur = g.db.cursor(cursor_factory=dictCursor)
-        cur.execute("SELECT cost FROM room WHERE room_id=%s", (form.room_id.data,))
-        cost = cur.fetchone()['cost']
+        cost = db.get_cost_by_id(form.room_id.data)
         info['amount'] = int(form.quantity.data) * nights * int(cost)
-        cur.execute(
-            "INSERT INTO transaction VALUES (DEFAULT, %(customer_id)s, %(payment_info)s, %(amount)s) RETURNING transaction_id;",
-            info)
-        info['transaction_id'] = cur.fetchone()['transaction_id']
+        info['transaction_id'] = db.create_transaction_get_id(info)
         cur.execute(
             "INSERT INTO booking VALUES (%(room_id)s, %(customer_id)s, %(transaction_id)s, %(quantity)s, %(checkin)s, %(checkout)s)",
             info)
