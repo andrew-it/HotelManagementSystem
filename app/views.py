@@ -358,7 +358,6 @@ def myHotels():
 @login_required
 def addHotel():
     db = AndrewDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
     form = CUHotelForm()
     if current_user.is_hotel_admin():
         if form.validate_on_submit():
@@ -384,53 +383,23 @@ def addHotel():
 @app.route('/edit-hotel/<int:hotel_id>', methods=['GET', 'POST'])
 @login_required
 def editHotel(hotel_id):
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     form = CUHotelForm()
     if current_user.is_hotel_admin():
         if form.validate_on_submit():
             img_name = imgName(form.img.data.filename)
             if img_name:
-                try:
-                    cur.execute("SELECT * FROM country WHERE country=%s AND city=%s;",
-                                (form.country.data, form.city.data))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                res = cur.fetchone()
+                res = db.get_city(form.country.data, form.city.data)
                 if not res:
-                    try:
-                        cur.execute("INSERT INTO country (country, city) VALUES (%s, %s);",
-                                    (form.country.data, form.city.data))
-                        g.db.commit()
-                    except Exception as e:
-                        print(e)
-                try:
-                    cur.execute("SELECT img FROM hotel WHERE hotel_id=%s;", (hotel_id,))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                old_img = cur.fetchone()['img']
+                    db.add_city(form.country.data, form.city.data)
+
+                old_img = db.get_image_name_by_hotel_id(hotel_id)
                 img_path = '/static/img/hotels/' + img_name
-                try:
-                    cur.execute(
-                        "UPDATE hotel SET (city, address, name, stars, description, img)=(%s, %s, %s, %s, %s, %s) WHERE hotel_id=%s;",
-                        (
-                            form.city.data, form.address.data, form.hotel_name.data, form.stars.data,
-                            form.description.data,
-                            img_path, hotel_id))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
+                db.update_hotel_by_id(hotel_id, form.city.data, form.address.data, form.hotel_name.data, form.stars.data, form.description.data, img_path)
                 form.img.data.save(os.path.join(app.config['UPLOAD_FOLDER'], img_name))
                 os.remove(os.path.abspath('app' + old_img))
                 return redirect(url_for('myHotels'))
-        try:
-            cur.execute("SELECT * FROM hotel h, country c WHERE hotel_id=%s AND h.city=c.city;", (hotel_id,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        res = cur.fetchone()
+        res = db.get_hotel_and_address_by_id(hotel_id)
         return render_template('edit_hotel.html', form=form, hotel=res)
     else:
         flash("Access error")

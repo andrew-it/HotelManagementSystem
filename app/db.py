@@ -308,6 +308,56 @@ class AndrewDB(Database):
         g.db.commit()
 
 
+    def get_city(self, country, city):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        try:
+            cur.execute("SELECT * FROM country WHERE country=%s AND city=%s;", (country, city))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        return cur.fetchone()
+
+    def add_city(self, country, city) -> bool:
+        cur = self.__get_cursor(self.ROLE_ADMIN)
+        try:
+            cur.execute("INSERT INTO country (country, city) VALUES (%s, %s);",
+                        (country, city))
+            g.db.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_image_name_by_hotel_id(self, hotel_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        try:
+            cur.execute("SELECT img FROM hotel WHERE hotel_id=%s;", (hotel_id,))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        return cur.fetchone()['img']
+
+    def update_hotel_by_id(self, hotel_id, city, address, hotel_name, stars, description, img_path) -> bool:
+        cur = self.__get_cursor(self.ROLE_ADMIN)
+        try:
+            cur.execute(
+                "UPDATE hotel SET (city, address, name, stars, description, img)=(%s, %s, %s, %s, %s, %s) WHERE hotel_id=%s;",
+                (city, address, hotel_name, stars, description, img_path, hotel_id))
+            g.db.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_hotel_and_address_by_id(self, hotel_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        try:
+            cur.execute("SELECT * FROM hotel h, country c WHERE hotel_id=%s AND h.city=c.city;", (hotel_id,))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        return cur.fetchone()
+
 class PostgresDatabase(Database):
     def method(self):
         # TODO
