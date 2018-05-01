@@ -1,6 +1,15 @@
 import psycopg2
 from flask import g
 
+def searchOp(args):
+    d = ['is_bathroom', 'is_tv', 'is_wifi', 'is_bathhub', 'is_airconditioniring']
+    s = []
+    for key in d:
+        if args[key]:
+            l = 'ro.' + key + '=%(' + key + ')s'
+            s.append(l)
+    s = ' AND '.join(s)
+    return '(' + s + ')'
 
 class Database:
     def method(self):
@@ -96,6 +105,12 @@ class AndrewDB(Database):
         cur.execute("SELECT * FROM vw_hotels WHERE hotel_id=%s", (hotel_id,))
         g.db.commit()
         return dict(cur.fetchone())
+
+    def get_vw_customer_by_id(self, person_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM vw_customers WHERE person_id=%s", (person_id,))
+        g.db.commit()
+        return cur.fetchone()
 
     def get_hotel_by_id(self, hotel_id):
         try:
@@ -357,6 +372,31 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
         return cur.fetchone()
+
+    def add_booking(self, info):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        try:
+            cur.execute("INSERT INTO booking VALUES (%(room_id)s, %(customer_id)s, %(transaction_id)s, %(quantity)s, %(checkin)s, %(checkout)s)", info)
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        return cur.fetchone()
+
+    def search_get_rooms(self, search):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        query = "SELECT * FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) INNER JOIN room_option ro ON (r.option_id=ro.option_id) WHERE r.hotel_id=%(hotel_id)s AND r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
+        if search['is_bathroom'] or search['is_tv'] or search['is_wifi'] or search['is_bathhub'] or search[
+            'is_airconditioniring']:
+            options = searchOp(search)
+            query += " AND " + options
+        if search['price_to'] != 0:
+            query += " AND (%(price_from)s <= r.cost AND %(price_to)s >= r.cost)"
+        try:
+            cur.execute(query, search)
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        cur.fetchall()
 
 class PostgresDatabase(Database):
     def method(self):

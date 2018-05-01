@@ -106,26 +106,11 @@ def moreInfo(hotel_id):
         cost = db.get_cost_by_id(form.room_id.data)
         info['amount'] = int(form.quantity.data) * nights * int(cost)
         info['transaction_id'] = db.create_transaction_get_id(info)
-        cur.execute(
-            "INSERT INTO booking VALUES (%(room_id)s, %(customer_id)s, %(transaction_id)s, %(quantity)s, %(checkin)s, %(checkout)s)",
-            info)
-        g.db.commit()
+        db.add_booking(info)
         flash('Room was reserved')
-    cur.execute("SELECT * FROM vw_hotels WHERE hotel_id=%s", (hotel_id,))
-    hotel = cur.fetchone()
-    # query = "SELECT * FROM room r LEFT OUTER JOIN (SELECT coalesce(SUM(b.quantity), 0) AS occupied, b.room_id FROM booking b WHERE NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date) GROUP BY (room_id)) AS oc ON (r.room_id=oc.room_id) NATURAL JOIN room_config rc NATURAL JOIN room_option ro WHERE hotel_id=%(hotel_id)s AND r.quantity > occupied AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
-    query = "SELECT * FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) INNER JOIN room_option ro ON (r.option_id=ro.option_id) WHERE r.hotel_id=%(hotel_id)s AND r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
-    if search['is_bathroom'] or search['is_tv'] or search['is_wifi'] or search['is_bathhub'] or search[
-        'is_airconditioniring']:
-        options = searchOp(search)
-        query += " AND " + options
-    if search['price_to'] != 0:
-        query += " AND (%(price_from)s <= r.cost AND %(price_to)s >= r.cost)"
-    cur.execute(query, search)
-    rooms = cur.fetchall()
-    cur.execute("SELECT * FROM vw_customers WHERE person_id=%s", (current_user.user_id,))
-    g.db.commit()
-    cust_info = cur.fetchone()
+    hotel = db.get_vw_hotel_by_id(hotel_id)
+    rooms = db.search_get_rooms(search)
+    cust_info = db.get_vw_customer_by_id(current_user.user_id)
     return render_template('booking.html', form=form, search=search, hotel=hotel, rooms=rooms, cust_info=cust_info)
 
 
