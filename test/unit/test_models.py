@@ -1,9 +1,11 @@
 import nose
+
 from app.models import User, AnonymousUser, Customer, HotelAdmin
 
 user_id = "user_id"
 email = "user_email@example.com"
 password = "12345678"
+
 
 
 def create_user(role="querty"):
@@ -24,6 +26,7 @@ def test_user_init():
 
     with nose.allure.step('Check user password'):
         assert(user.password == password)
+
 
 
 @nose.allure.feature('Status')
@@ -186,6 +189,7 @@ def test_customer():
     with nose.allure.step('Initialize customer'):
         customer = Customer(first_name, last_name, email, phone_number, payment_info)
 
+
     with nose.allure.step('Check first name'):
         assert(customer.first_name == first_name)
 
@@ -200,6 +204,7 @@ def test_customer():
 
     with nose.allure.step('Check payment info'):
         assert(customer.payment_info == payment_info)
+
 
 
 @nose.allure.feature('Initialization')
