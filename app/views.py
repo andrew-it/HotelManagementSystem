@@ -164,30 +164,21 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    g.role = 'customer'
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     form = RegisterForm()
     if form.validate_on_submit():
         if not form.password.data == form.password_confirmation.data:
             return redirect(url_for('register'))
-        try:
-            hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-            cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING *;",
-                        (form.email.data, hash_password, g.role))
-        except psycopg2.IntegrityError:
-            g.db.rollback()
+
+        hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        res = db.insert_sys_user(form.email.data, hash_password, g.role)
+        if not res:
             flash('User with this email already registered')
             return redirect(url_for('register'))
-        res = cur.fetchone()
+
+        db.add_customer(res['user_id'], form.first_name.data, form.last_name.data, form.telephone.data)
+
         user = User(res['user_id'], res['email'], res['password'], res['role'])
-        try:
-            cur.execute(
-                "INSERT INTO customer (person_id, first_name, last_name, phone_number) VALUES (%s, %s, %s, %s);",
-                (res['user_id'], form.first_name.data, form.last_name.data, form.telephone.data))
-            g.db.commit()
-        except Exception as e:
-            print(e)
         login_user(user)
         flash('User successfully registered')
         return redirect(url_for('index'))
@@ -226,74 +217,52 @@ def addProperty():
     return render_template('property.html', form=form)
 
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET'])
 @login_required
-def profile():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+def update_profile():
+    db = AndrewDB()
     form = ProfileForm()
     user = current_user
     user_info = None
-    if form.validate_on_submit():
-        if user.is_customer():
-            try:
-                cur.execute(
-                    "UPDATE customer SET (first_name, last_name, phone_number, payment_info)=(%s, %s, %s, %s) WHERE person_id=%s;",
-                    (form.first_name.data, form.last_name.data, form.telephone.data, form.credit_card.data,
-                     user.user_id))
-                g.db.commit()
-            except Exception as e:
-                print(e)
-            return redirect(url_for('index'))
-        elif user.is_hotel_admin():
-            try:
-                cur.execute(
-                    "UPDATE hotel_admin SET (first_name, last_name, phone_number)=(%s, %s, %s) WHERE person_id=%s;",
-                    (form.first_name.data, form.last_name.data, form.telephone.data, user.user_id))
-                g.db.commit()
-            except Exception as e:
-                print(e)
-            return redirect(url_for('index'))
-        elif user.is_admin():
-            try:
-                cur.execute("UPDATE admin SET (first_name, last_name, phone_number)=(%s, %s, %s) WHERE person_id=%s;",
-                            (form.first_name.data, form.last_name.data, form.telephone.data, user.user_id))
-                g.db.commit()
-            except Exception as e:
-                print(e)
-            return redirect(url_for('admin'))
+
     if user.is_customer():
-        try:
-            cur.execute("SELECT * FROM customer WHERE person_id=%s;", (user.user_id,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        res = cur.fetchone()
+        res = db.get_customer_by_id(user.user_id)
         user_info = Customer(res['first_name'],
                              res['last_name'],
                              user.email,
                              res['phone_number'],
                              res['payment_info'])
     elif user.is_hotel_admin():
-        try:
-            cur.execute("SELECT * FROM hotel_admin WHERE person_id=%s;", (user.user_id,))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        res = cur.fetchone()
+        res = db.get_hotel_admin_by_id(user.user_id)
         user_info = HotelAdmin(res['first_name'], res['last_name'], user.email, res['phone_number'])
     elif user.is_receptionist():
-        cur.execute("SELECT * FROM receptionist WHERE person_id=%s;", (user.user_id,))
-        g.db.commit()
-        user_info = dict(cur.fetchone())
+        user_info = db.get_receptionist_by_id(user.user_id)
         user_info['email'] = user.email
     elif user.is_admin():
-        cur.execute("SELECT * FROM admin WHERE person_id=%s;", (user.user_id,))
-        g.db.commit()
-        user_info = dict(cur.fetchone())
+        db.get_admin_by_id(user.user_id)
         user_info['email'] = user.email
     return render_template('profile.html', form=form, user=user_info)
 
+@app.route('/profile', methods=['POST'])
+@login_required
+def update_profile():
+    db = AndrewDB()
+    form = ProfileForm()
+    user = current_user
+
+    if form.validate_on_submit():
+        if user.is_customer():
+            db.update_customer(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data, form.credit_card.data)
+            return redirect(url_for('index'))
+        elif user.is_hotel_admin():
+            db.update_hotel_admin(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data)
+            return redirect(url_for('index'))
+        elif user.is_admin():
+            db.update_admin(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data)
+            return redirect(url_for('admin'))
+
+    flash("Invalid form")
+    return redirect(url_for('index'))
 
 @app.route('/my-hotel', methods=['GET', 'POST'])
 @login_required
@@ -514,7 +483,7 @@ def admin():
     g.role = 'admin'
     if request.method == 'POST' and form.validate_on_submit():
         hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user_id = db.insert_sys_user(form.email.data, hash_password)
+        user_id = db.insert_sys_user_get_id(form.email.data, hash_password)
         if user_id is None:
             flash('User with this email already registered')
             return redirect(url_for('admin'))

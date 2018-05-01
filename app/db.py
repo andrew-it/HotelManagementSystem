@@ -35,13 +35,20 @@ class AndrewDB(Database):
         g.role = role
         return g.db.cursor(cursor_factory=dict_cursor)
 
-    def insert_sys_user(self, email: str, password: str) -> [None, int]:
+    def insert_sys_user_get_id(self, email: str, password: str) -> [None, int]:
+        res = self.insert_sys_user(email, password)
+        if res:
+            return res['user_id']
+        else:
+            return None
+
+    def insert_sys_user(self, email: str, password: str):
         try:
             cur = self.__get_cursor(self.ROLE_ADMIN)
             cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING user_id;",
                         (email, password, self.ROLE_ADMIN))
             g.db.commit()
-            return cur.fetchone()['user_id']
+            return cur.fetchone()
         except psycopg2.IntegrityError:
             g.db.rollback()
             return None
@@ -119,7 +126,32 @@ class AndrewDB(Database):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
         cur.execute("SELECT * FROM vw_customers WHERE person_id=%s", (person_id,))
         g.db.commit()
-        return cur.fetchone()
+        return dict(cur.fetchone())
+
+    def get_customer_by_id(self, person_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM customers WHERE person_id=%s", (person_id,))
+        g.db.commit()
+        res = dict(cur.fetchone())
+
+    def get_hotel_admin_by_id(self, person_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM hotel_admin WHERE person_id=%s", (person_id,))
+        g.db.commit()
+        return dict(cur.fetchone())
+
+    def get_receptionist_by_id(self, person_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM receptionist WHERE person_id=%s", (person_id,))
+        g.db.commit()
+        return dict(cur.fetchone())
+
+    def get_admin_by_id(self, person_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        cur.execute("SELECT * FROM admin WHERE person_id=%s", (person_id,))
+        g.db.commit()
+        return dict(cur.fetchone())
+
 
     def get_hotel_by_id(self, hotel_id):
         try:
@@ -406,6 +438,48 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
         cur.fetchall()
+
+    def add_customer(self, person_id, first_name, last_name, phone_number):
+        try:
+            cur = self.__get_cursor(self.ROLE_CUSTOMER)
+            cur.execute(
+                "INSERT INTO customer (person_id, first_name, last_name, phone_number) VALUES (%s, %s, %s, %s);",
+                (person_id, first_name, last_name, phone_number))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+
+    def update_customer(self, person_id, first_name, last_name, phone_number, payment_info):
+        try:
+            cur = self.__get_cursor(self.ROLE_CUSTOMER)
+            cur.execute(
+                "UPDATE customer SET (first_name, last_name, phone_number, payment_info)=(%s, %s, %s, %s) "
+                "WHERE person_id=%s;",
+                (person_id, first_name, last_name, phone_number, payment_info))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+
+    def update_hotel_admin(self, person_id, first_name, last_name, phone_number):
+        try:
+            cur = self.__get_cursor(self.ROLE_HOTEL_ADMIN)
+            cur.execute(
+                "UPDATE hotel_admin SET (first_name, last_name, phone_number)=(%s, %s, %s) WHERE person_id=%s;",
+                (first_name, last_name, phone_number, person_id))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+
+    def update_admin(self, person_id, first_name, last_name, phone_number):
+        try:
+            cur = self.__get_cursor(self.ROLE_HOTEL_ADMIN)
+            cur.execute(
+                "UPDATE admin SET (first_name, last_name, phone_number)=(%s, %s, %s) WHERE person_id=%s;",
+                (first_name, last_name, phone_number, person_id))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+
 
 class PostgresDatabase(Database):
     def method(self):
