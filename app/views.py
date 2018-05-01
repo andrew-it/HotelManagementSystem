@@ -24,17 +24,6 @@ def connectToDB():
         print("Can't connect to database")
 
 
-def searchOp(args):
-    d = ['is_bathroom', 'is_tv', 'is_wifi', 'is_bathhub', 'is_airconditioniring']
-    s = []
-    for key in d:
-        if args[key]:
-            l = 'ro.' + key + '=%(' + key + ')s'
-            s.append(l)
-    s = ' AND '.join(s)
-    return '(' + s + ')'
-
-
 def imgName(filename):
     img_name = None
     if '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']:
@@ -65,8 +54,7 @@ def index():
 
 @app.route('/search-hotel', methods=['GET', 'POST'])
 def searchHotel():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     form = InfoForm()
     hotels = None
     search = session['search']
@@ -75,17 +63,8 @@ def searchHotel():
             flash("You must be authorized to reserve rooms")
             return redirect(url_for('login'))
         return redirect(url_for('moreInfo', hotel_id=form.hotel_id.data))
-    query = "SELECT * FROM hotel h INNER JOIN country c ON (h.city=c.city) AND (lower(h.city) LIKE %(destination)s OR lower(c.country) LIKE %(destination)s OR lower(h.name) LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
-    if search['is_bathroom'] or search['is_tv'] or search['is_wifi'] or search['is_bathhub'] or search[
-        'is_airconditioniring']:
-        options = searchOp(search)
-        query = "SELECT * FROM hotel h, country c WHERE h.city = c.city AND (lower(h.city) LIKE %(destination)s OR lower(c.country) LIKE %(destination)s OR lower(h.name) LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id FROM room r, room_config rc, room_option ro WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.config_id=rc.config_id AND r.option_id=ro.option_id AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s) AND " + options
-    if search['price_to'] != 0:
-        query += " AND (%(price_from)s <= r.cost AND %(price_to)s >= r.cost)"
-    query += ")"
-    cur.execute(query, search)
-    g.db.commit()
-    hotels = cur.fetchall()
+
+    hotels = db.search_hotels_by_form(search)
     return render_template('search_hotel.html', form=form, hotels=hotels)
 
 
@@ -116,14 +95,8 @@ def moreInfo(hotel_id):
 
 @login_manager.user_loader
 def load_user(user_id):
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
-    try:
-        cur.execute("SELECT * FROM sys_user WHERE user_id=%s;", (user_id,))
-    except Exception as e:
-        print(e)
-    res = cur.fetchone()
-    g.db.commit()
+    db = AndrewDB()
+    res = db.get_user_by_id(user_id)
     if not res:
         return None
     return User(res['user_id'], res['email'], res['password'], res['role'])
@@ -188,29 +161,17 @@ def register():
 @app.route('/add-property', methods=['GET', 'POST'])
 def addProperty():
     g.role = 'hotel_admin'
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     form = RegisterForm()
     if form.validate_on_submit():
         if not form.password.data == form.password_confirmation.data:
             return redirect(url_for('addProperty'))
-        try:
-            hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-            cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING *;",
-                        (form.email.data, hash_password, g.role))
-        except psycopg2.IntegrityError:
-            g.db.rollback()
+        hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        res = db.insert_sys_user(form.email.data, hash_password)
+        if res is None:
             flash('User with this email already registered')
             return redirect(url_for('addProperty'))
-        res = cur.fetchone()
         user = User(res['user_id'], res['email'], res['password'], res['role'])
-        try:
-            cur.execute(
-                "INSERT INTO hotel_admin (person_id, first_name, last_name, phone_number) VALUES (%s, %s, %s, %s);",
-                (res['user_id'], form.first_name.data, form.last_name.data, form.telephone.data))
-            g.db.commit()
-        except Exception as e:
-            print(e)
         login_user(user)
         flash('User successfully registered')
         return redirect(url_for('myHotels'))
@@ -267,20 +228,14 @@ def update_profile():
 @app.route('/my-hotel', methods=['GET', 'POST'])
 @login_required
 def myHotels():
-    g.db = connectToDB()
-    cur = g.db.cursor(cursor_factory=dictCursor)
+    db = AndrewDB()
     form = UDHotelForm()
     if current_user.is_hotel_admin():
         if form.validate_on_submit():
             if form.edit.data:
                 return redirect(url_for('editHotel', hotel_id=form.hotel_id.data))
             if form.delete.data:
-                try:
-                    cur.execute("DELETE FROM hotel WHERE hotel_id=%s RETURNING img;", (form.hotel_id.data,))
-                    g.db.commit()
-                except Exception as e:
-                    print(e)
-                img = cur.fetchone()['img']
+                img = db.remove_hotel_by_id(form.hotel_id.data)
                 os.remove(os.path.abspath('app' + img))
                 flash('Hotel was removed')
                 return redirect(url_for('myHotels'))
@@ -288,13 +243,7 @@ def myHotels():
                 return redirect(url_for('manageHotel', hotel_id=form.hotel_id.data))
             if form.add_hotel.data:
                 return redirect(url_for('addHotel'))
-        try:
-            cur.execute("SELECT * FROM hotel h, country c WHERE owner_id=%s AND h.city=c.city;",
-                        (current_user.get_id(),))
-            g.db.commit()
-        except Exception as e:
-            print(e)
-        hotels = cur.fetchall()
+        hotels = db.get_hotels_by_admin_id(current_user.get_id())
         return render_template('my_hotel.html', form=form, hotels=hotels)
     else:
         flash("Access error")

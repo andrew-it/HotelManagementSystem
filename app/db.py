@@ -1,6 +1,9 @@
 import psycopg2
 from flask import g
 
+from app import bcrypt
+
+
 def searchOp(args):
     d = ['is_bathroom', 'is_tv', 'is_wifi', 'is_bathhub', 'is_airconditioniring']
     s = []
@@ -480,6 +483,51 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
 
+
+    def search_hotels_by_form(self, search):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        query = "SELECT * FROM hotel h INNER JOIN country c ON (h.city=c.city) AND (lower(h.city) LIKE %(destination)s OR lower(c.country) LIKE %(destination)s OR lower(h.name) LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
+        if search['is_bathroom'] or search['is_tv'] or search['is_wifi'] or search['is_bathhub'] or search[
+            'is_airconditioniring']:
+            options = searchOp(search)
+            query = "SELECT * FROM hotel h, country c WHERE h.city = c.city AND (lower(h.city) LIKE %(destination)s OR lower(c.country) LIKE %(destination)s OR lower(h.name) LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id FROM room r, room_config rc, room_option ro WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.config_id=rc.config_id AND r.option_id=ro.option_id AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s) AND " + options
+        if search['price_to'] != 0:
+            query += " AND (%(price_from)s <= r.cost AND %(price_to)s >= r.cost)"
+        query += ")"
+        cur.execute(query, search)
+        g.db.commit()
+        return cur.fetchall()
+
+
+    def get_user_by_id(self, user_id):
+        cur = self.__get_cursor(self.ROLE_CUSTOMER)
+        try:
+            cur.execute("SELECT * FROM sys_user WHERE user_id=%s;", (user_id,))
+        except Exception as e:
+            print(e)
+        g.db.commit()
+        return cur.fetchone()
+
+
+    def remove_hotel_by_id(self, hotel_id):
+        cur = self.__get_cursor(self.ROLE_ADMIN)
+        try:
+            cur.execute("DELETE FROM hotel WHERE hotel_id=%s RETURNING img;", (hotel_id,))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        return cur.fetchone()['img']
+
+
+    def get_hotels_by_admin_id(self, user_id):
+        cur = self.__get_cursor(self.ROLE_ADMIN)
+        try:
+            cur.execute("SELECT * FROM hotel h, country c WHERE owner_id=%s AND h.city=c.city;",
+                        (user_id,))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+        return cur.fetchall()
 
 class PostgresDatabase(Database):
     def method(self):
