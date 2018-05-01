@@ -292,6 +292,21 @@ class AndrewDB(Database):
         g.db.commit()
         return cur.fetchone()['transaction_id']
 
+    def insert_location_if_not_exists(self, country, city):
+        cur = self.__get_cursor(self.ROLE_ADMIN)
+        cur.execute("SELECT * FROM country WHERE country=%s AND city=%s;",  (country, city))
+        g.db.commit()
+        if not cur.fetchone():
+            cur.execute("INSERT INTO country (country, city) VALUES (%s, %s);", (country, city))
+            g.db.commit()
+
+    def add_hotel(self, city, address, name, stars, description, owner_id, img):
+        cur = self.__get_cursor(self.ROLE_ADMIN)
+        cur.execute(
+            "INSERT INTO hotel (city, address, name, stars, description, owner_id, img) VALUES (%s, %s, %s, %s, %s, %s, %s);",
+            (city, address, name, stars, description, owner_id, img))
+        g.db.commit()
+
 
 class PostgresDatabase(Database):
     def method(self):
