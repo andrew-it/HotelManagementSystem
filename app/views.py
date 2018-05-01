@@ -81,7 +81,6 @@ def moreInfo(hotel_id):
         checkout = datetime.datetime.strptime(search['checkout'], '%Y-%m-%d').date()
         nights = (checkout - checkin).days
         g.db = connectToDB()
-        cur = g.db.cursor(cursor_factory=dictCursor)
         cost = db.get_cost_by_id(form.room_id.data)
         info['amount'] = int(form.quantity.data) * nights * int(cost)
         info['transaction_id'] = db.create_transaction_get_id(info)
@@ -159,7 +158,7 @@ def register():
 
 
 @app.route('/add-property', methods=['GET', 'POST'])
-def addProperty():
+def add_roperty():
     g.role = 'hotel_admin'
     db = AndrewDB()
     form = RegisterForm()
@@ -180,7 +179,7 @@ def addProperty():
 
 @app.route('/profile', methods=['GET'])
 @login_required
-def update_profile():
+def get_profile():
     db = AndrewDB()
     form = ProfileForm()
     user = current_user
@@ -204,6 +203,7 @@ def update_profile():
         user_info['email'] = user.email
     return render_template('profile.html', form=form, user=user_info)
 
+
 @app.route('/profile', methods=['POST'])
 @login_required
 def update_profile():
@@ -213,7 +213,8 @@ def update_profile():
 
     if form.validate_on_submit():
         if user.is_customer():
-            db.update_customer(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data, form.credit_card.data)
+            db.update_customer(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data,
+                               form.credit_card.data)
             return redirect(url_for('index'))
         elif user.is_hotel_admin():
             db.update_hotel_admin(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data)
@@ -224,6 +225,7 @@ def update_profile():
 
     flash("Invalid form")
     return redirect(url_for('index'))
+
 
 @app.route('/my-hotel', methods=['GET', 'POST'])
 @login_required
@@ -291,7 +293,8 @@ def editHotel(hotel_id):
 
                 old_img = db.get_image_name_by_hotel_id(hotel_id)
                 img_path = '/static/img/hotels/' + img_name
-                db.update_hotel_by_id(hotel_id, form.city.data, form.address.data, form.hotel_name.data, form.stars.data, form.description.data, img_path)
+                db.update_hotel_by_id(hotel_id, form.city.data, form.address.data, form.hotel_name.data,
+                                      form.stars.data, form.description.data, img_path)
                 form.img.data.save(os.path.join(app.config['UPLOAD_FOLDER'], img_name))
                 os.remove(os.path.abspath('app' + old_img))
                 return redirect(url_for('myHotels'))

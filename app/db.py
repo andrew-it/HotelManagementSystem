@@ -7,10 +7,11 @@ def searchOp(args):
     s = []
     for key in d:
         if args[key]:
-            l = 'ro.' + key + '=%(' + key + ')s'
-            s.append(l)
+            line = 'ro.' + key + '=%(' + key + ')s'
+            s.append(line)
     s = ' AND '.join(s)
     return '(' + s + ')'
+
 
 class Database:
     def method(self):
@@ -152,7 +153,6 @@ class AndrewDB(Database):
         cur.execute("SELECT * FROM admin WHERE person_id=%s", (person_id,))
         g.db.commit()
         return dict(cur.fetchone())
-
 
     def get_hotel_by_id(self, hotel_id):
         try:
@@ -344,14 +344,15 @@ class AndrewDB(Database):
     def create_transaction_get_id(self, info):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
         cur.execute(
-            "INSERT INTO transaction VALUES (DEFAULT, %(customer_id)s, %(payment_info)s, %(amount)s) RETURNING transaction_id;",
+            "INSERT INTO transaction VALUES (DEFAULT, %(customer_id)s, %(payment_info)s, %(amount)s) "
+            "RETURNING transaction_id;",
             info)
         g.db.commit()
         return cur.fetchone()['transaction_id']
 
     def insert_location_if_not_exists(self, country, city):
         cur = self.__get_cursor(self.ROLE_ADMIN)
-        cur.execute("SELECT * FROM country WHERE country=%s AND city=%s;",  (country, city))
+        cur.execute("SELECT * FROM country WHERE country=%s AND city=%s;", (country, city))
         g.db.commit()
         if not cur.fetchone():
             cur.execute("INSERT INTO country (country, city) VALUES (%s, %s);", (country, city))
@@ -360,10 +361,10 @@ class AndrewDB(Database):
     def add_hotel(self, city, address, name, stars, description, owner_id, img):
         cur = self.__get_cursor(self.ROLE_ADMIN)
         cur.execute(
-            "INSERT INTO hotel (city, address, name, stars, description, owner_id, img) VALUES (%s, %s, %s, %s, %s, %s, %s);",
+            "INSERT INTO hotel (city, address, name, stars, description, owner_id, img) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s);",
             (city, address, name, stars, description, owner_id, img))
         g.db.commit()
-
 
     def get_city(self, country, city):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
@@ -398,7 +399,8 @@ class AndrewDB(Database):
         cur = self.__get_cursor(self.ROLE_ADMIN)
         try:
             cur.execute(
-                "UPDATE hotel SET (city, address, name, stars, description, img)=(%s, %s, %s, %s, %s, %s) WHERE hotel_id=%s;",
+                "UPDATE hotel SET (city, address, name, stars, description, img)=(%s, %s, %s, %s, %s, %s) "
+                "WHERE hotel_id=%s;",
                 (city, address, hotel_name, stars, description, img_path, hotel_id))
             g.db.commit()
             return True
@@ -418,7 +420,10 @@ class AndrewDB(Database):
     def add_booking(self, info):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
         try:
-            cur.execute("INSERT INTO booking VALUES (%(room_id)s, %(customer_id)s, %(transaction_id)s, %(quantity)s, %(checkin)s, %(checkout)s)", info)
+            cur.execute(
+                "INSERT INTO booking "
+                "VALUES (%(room_id)s, %(customer_id)s, %(transaction_id)s, %(quantity)s, %(checkin)s, %(checkout)s)",
+                info)
             g.db.commit()
         except Exception as e:
             print(e)
@@ -426,9 +431,17 @@ class AndrewDB(Database):
 
     def search_get_rooms(self, search):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
-        query = "SELECT * FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) INNER JOIN room_option ro ON (r.option_id=ro.option_id) WHERE r.hotel_id=%(hotel_id)s AND r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
-        if search['is_bathroom'] or search['is_tv'] or search['is_wifi'] or search['is_bathhub'] or search[
-            'is_airconditioniring']:
+        query = "SELECT * FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) " \
+                "INNER JOIN room_option ro ON (r.option_id=ro.option_id) " \
+                "WHERE r.hotel_id=%(hotel_id)s AND r.quantity > (SELECT coalesce(MAX(b.quantity), 0) " \
+                "FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date " \
+                "OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s " \
+                "AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
+        if search['is_bathroom'] or \
+                search['is_tv'] or \
+                search['is_wifi'] or \
+                search['is_bathhub'] or \
+                search['is_airconditioniring']:
             options = searchOp(search)
             query += " AND " + options
         if search['price_to'] != 0:
@@ -481,21 +494,36 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
 
-
     def search_hotels_by_form(self, search):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
-        query = "SELECT * FROM hotel h INNER JOIN country c ON (h.city=c.city) AND (lower(h.city) LIKE %(destination)s OR lower(c.country) LIKE %(destination)s OR lower(h.name) LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
-        if search['is_bathroom'] or search['is_tv'] or search['is_wifi'] or search['is_bathhub'] or search[
-            'is_airconditioniring']:
+        query = "SELECT * FROM hotel h INNER JOIN country c ON (h.city=c.city) AND (lower(h.city) " \
+                "LIKE %(destination)s OR lower(c.country) LIKE %(destination)s " \
+                "OR lower(h.name) LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id " \
+                "FROM room r INNER JOIN room_config rc ON (r.config_id=rc.config_id) " \
+                "WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b " \
+                "WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date " \
+                "OR %(checkin)s >= b.checkout_date)) AND r.quantity >= %(quantity)s " \
+                "AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s)"
+        if search['is_bathroom'] or \
+                search['is_tv'] or \
+                search['is_wifi'] or \
+                search['is_bathhub'] or \
+                search['is_airconditioniring']:
             options = searchOp(search)
-            query = "SELECT * FROM hotel h, country c WHERE h.city = c.city AND (lower(h.city) LIKE %(destination)s OR lower(c.country) LIKE %(destination)s OR lower(h.name) LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id FROM room r, room_config rc, room_option ro WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date OR %(checkin)s >= b.checkout_date)) AND r.config_id=rc.config_id AND r.option_id=ro.option_id AND r.quantity >= %(quantity)s AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s) AND " + options
+            query = "SELECT * FROM hotel h, country c WHERE h.city = c.city AND (lower(h.city) " \
+                    "LIKE %(destination)s OR lower(c.country) LIKE %(destination)s OR lower(h.name) " \
+                    "LIKE %(destination)s) AND EXISTS(SELECT r.hotel_id FROM room r, room_config rc, room_option ro " \
+                    "WHERE r.quantity > (SELECT coalesce(MAX(b.quantity), 0) FROM booking b " \
+                    "WHERE r.room_id = b.room_id AND NOT (%(checkout)s <= b.checkin_date " \
+                    "OR %(checkin)s >= b.checkout_date)) AND r.config_id=rc.config_id " \
+                    "AND r.option_id=ro.option_id AND r.quantity >= %(quantity)s " \
+                    "AND (rc.single_bed + 2 * rc.double_bed + rc.sofa_bed >= %(sleeps)s) AND " + options
         if search['price_to'] != 0:
             query += " AND (%(price_from)s <= r.cost AND %(price_to)s >= r.cost)"
         query += ")"
         cur.execute(query, search)
         g.db.commit()
         return cur.fetchall()
-
 
     def get_user_by_id(self, user_id):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
@@ -506,7 +534,6 @@ class AndrewDB(Database):
         g.db.commit()
         return cur.fetchone()
 
-
     def remove_hotel_by_id(self, hotel_id):
         cur = self.__get_cursor(self.ROLE_ADMIN)
         try:
@@ -515,7 +542,6 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
         return cur.fetchone()['img']
-
 
     def get_hotels_by_admin_id(self, user_id):
         cur = self.__get_cursor(self.ROLE_ADMIN)
@@ -526,6 +552,7 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
         return cur.fetchall()
+
 
 class PostgresDatabase(Database):
     def method(self):
