@@ -300,13 +300,13 @@ class AndrewDB(Database):
             g.db.rollback()
             return None
 
-    def add_new_receptionist(self, user_id, hotel_id, f_name, l_name, phone) -> bool:
+    def add_new_receptionist(self, user_id, hotel_id, f_name, l_name, phone, salary) -> bool:
         try:
             cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
             cur.execute(
                 "INSERT INTO receptionist (person_id, hotel_id, first_name, last_name, phone_number, salary) "
                 "VALUES (%s, %s, %s, %s, %s, %s);",
-                (user_id, hotel_id, f_name, l_name, phone))
+                (user_id, hotel_id, f_name, l_name, phone, salary))
             g.db.commit()
             return True
         except Exception as e:
