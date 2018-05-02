@@ -38,11 +38,11 @@ node {
 
     } finally {
         stage("Allure report"){
-            allure includeProperties: false, jdk: '', results: [[path: 'test/result']]
+            allure includeProperties: false, jdk: '', results: [[path: 'test/unit/result'], [path: 'test/api/result'], [path: 'test/static/result']]
         }
 
         stage("Coverage report"){
-            cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'test/result/coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '20, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+            cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'test/unit/result/coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '20, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
         }
     }
 }
