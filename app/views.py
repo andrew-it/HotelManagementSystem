@@ -136,6 +136,7 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    g.role = 'customer'
     db = AndrewDB()
     form = RegisterForm()
     if form.validate_on_submit():
@@ -150,7 +151,7 @@ def register():
 
         db.add_customer(res['user_id'], form.first_name.data, form.last_name.data, form.telephone.data)
 
-        user = User(res['user_id'], res['email'], res['password'], res['role'])
+        user = User(res['user_id'], form.email.data, hash_password, g.role)
         login_user(user)
         flash('User successfully registered')
         return redirect(url_for('index'))
