@@ -1,4 +1,3 @@
-import nose
 import allure
 from app.models import User, AnonymousUser, Customer, HotelAdmin
 
