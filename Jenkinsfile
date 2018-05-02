@@ -4,9 +4,7 @@ node {
     def testImage = docker.build("test_hms")
 
     testImage.inside{
-        stage("Unit Test"){
-            sh 'test/run_unit.sh'
-        }
+
 
         stage("Run Mypy"){
             sh 'test/run_mypy.sh'
