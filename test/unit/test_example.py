@@ -1,8 +1,9 @@
 import nose
+import allure
 
 def test_foo():
-    with nose.allure.step('step one'):
+    with allure.step('step one'):
         assert(True == True)
 
-    with nose.allure.step('step two'):
+    with allure.step('step two'):
         assert(False == False)
