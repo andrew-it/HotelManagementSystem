@@ -4,3 +4,4 @@ flake8-junit-report==2.1.0
 pytest==3.5.1
 mypy==0.580
 requests
+pytest-cov
