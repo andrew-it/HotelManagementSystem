@@ -1,2 +1,2 @@
 #!/bin/bash
-py.test --alluredir=test/result/ ./test/api
+python -m pytest --alluredir=test/result/ ./test/api
