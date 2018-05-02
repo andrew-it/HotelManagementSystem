@@ -28,6 +28,17 @@ def test_insert_sys_user(mock_connect):
             result = db.insert_sys_user("email@example.com", "123456")
         assert result == expected
 
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_get_sys_user_by_email(mock_connect):
+    with allure.step('Get sys_user by email'):
+        with app.app_context():
+            db = AndrewDB()
+            expected = {'user_id': 5, 'email': "email@example.com", 'password': "123456", 'role': "ROLE_ADMIN"}
+            mock_connect().cursor.return_value.fetchone.return_value = expected
+            result = db.get_sys_user_by_email("email@example.com")
+        assert result == expected
+
 
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
@@ -88,7 +99,7 @@ def test_get_admins(mock_connect):
 
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
-def get_room_by_params(mock_connect):
+def test_get_room_by_params(mock_connect):
     with allure.step('Get room by parameters'):
         with app.app_context():
             db = AndrewDB()
@@ -271,6 +282,13 @@ def test_delete_room_by_id(mock_connect):
             db = AndrewDB()
             db.delete_room_by_id(1)
 
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_delete_receptionist_by_id(mock_connect):
+    with allure.step('Delete receptionist by id'):
+        with app.app_context():
+            db = AndrewDB()
+            db.delete_receptionist_by_id(1)
 
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
@@ -346,7 +364,7 @@ def test_get_cost_by_id(mock_connect):
 
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
-def task_create_transaction_get_id(mock_connect):
+def test_create_transaction_get_id(mock_connect):
     with allure.step('Create transaction and get id'):
         with app.app_context():
             db = AndrewDB()
@@ -374,19 +392,153 @@ def test_add_hotel(mock_connect):
             db.add_hotel("Moscow", "Innopolis", "NoName", 4, "Not named hotel", 1, "noname.png")
 
 
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_get_image_name_by_hotel_id(mock_connect):
+    with allure.step('Get hotel image'):
+        with app.app_context():
+            db = AndrewDB()
+            expected = {'img': "noname.png"}
+            mock_connect().cursor.return_value.fetchone.return_value = expected
+            result = db.get_image_name_by_hotel_id({})
+        assert result == expected['img']
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_update_hotel_by_id(mock_connect):
+    with allure.step('Update hotel'):
+        with app.app_context():
+            db = AndrewDB()
+            result = db.update_hotel_by_id(1, "Moscow", "Innopolis", "NoName", 4, "Not named hotel", "noname.png")
+        assert result
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_get_hotel_and_address_by_id(mock_connect):
+    with allure.step('Get hotel and address'):
+        with app.app_context():
+            db = AndrewDB()
+            expected = {'hotel_id': "1", 'address': "Innopolis"}
+            mock_connect().cursor.return_value.fetchone.return_value = expected
+            result = db.get_hotel_and_address_by_id(1)
+        assert result == expected
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_add_booking(mock_connect):
+    with allure.step('Add booking'):
+        with app.app_context():
+            db = AndrewDB()
+            db.add_booking({})
+
+
+def create_search_form(is_bathroom=True, is_tv=True, is_wifi=True, is_bathhub=True, is_airconditioniring=True):
+    return {
+        'is_bathroom': is_bathroom,
+        'is_tv': is_tv,
+        'is_wifi': is_wifi,
+        'is_bathhub': is_bathhub,
+        'is_airconditioniring': is_airconditioniring,
+        'price_to': 100
+    }
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_search_get_rooms(mock_connect):
+    with allure.step('Get rooms by search query'):
+        with app.app_context():
+            db = AndrewDB()
+            expected = ['room1', 'room2']
+            mock_connect().cursor.return_value.fetchall.return_value = expected
+            result = db.search_get_rooms(create_search_form())
+        assert result == expected
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_add_customer(mock_connect):
+    with allure.step('Add customer'):
+        with app.app_context():
+            db = AndrewDB()
+            db.add_customer(1, "John", "Doe", "+0-000-00-00-00")
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_update_customer(mock_connect):
+    with allure.step('Update customer'):
+        with app.app_context():
+            db = AndrewDB()
+            db.update_customer(1, "John", "Doe", "+0-000-00-00-00", "000000000000000")
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_update_hotel_admin(mock_connect):
+    with allure.step('Update hotel admin'):
+        with app.app_context():
+            db = AndrewDB()
+            db.update_hotel_admin(1, "John", "Doe", "+0-000-00-00-00")
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_update_admin(mock_connect):
+    with allure.step('Update admin'):
+        with app.app_context():
+            db = AndrewDB()
+            db.update_admin(1, "John", "Doe", "+0-000-00-00-00")
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_search_hotel_by_form(mock_connect):
+    with allure.step('Get rooms by search query'):
+        with app.app_context():
+            db = AndrewDB()
+            expected = ['hotel1', 'hotel2']
+            mock_connect().cursor.return_value.fetchall.return_value = expected
+            result = db.search_hotels_by_form(create_search_form())
+        assert result == expected
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_get_user_by_id(mock_connect):
+    with allure.step('Get user by id'):
+        with app.app_context():
+            db = AndrewDB()
+            expected = {1: 'user1'}
+            mock_connect().cursor.return_value.fetchone.return_value = expected
+            result = db.get_user_by_id(1)
+        assert result == expected
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_delete_hotel_by_id(mock_connect):
+    with allure.step('Delete hotel'):
+        with app.app_context():
+            db = AndrewDB()
+            db.remove_hotel_by_id(1)
+
+
+@allure.feature("Database")
+@mock.patch("psycopg2.connect")
+def test_get_hotels_by_admin_id(mock_connect):
+    with allure.step('Get user by id'):
+        with app.app_context():
+            db = AndrewDB()
+            expected = ['hotel1', 'hotel2']
+            mock_connect().cursor.return_value.fetchall.return_value = expected
+            result = db.get_hotels_by_admin_id(1)
+        assert result == expected
 
 @allure.feature("Helpers")
 def test_searchOp():
     """Test that seatchOp generates valid SQL queries"""
-
-    def create_search_form(is_bathroom="no", is_tv="no", is_wifi="no", is_bathhub="no", is_airconditioniring="no"):
-        return {
-            'is_bathroom': is_bathroom,
-            'is_tv': is_tv,
-            'is_wifi': is_wifi,
-            'is_bathhub': is_bathhub,
-            'is_airconditioniring': is_airconditioniring
-        }
 
     with allure.step("Check that empty form yields empty SQL query"):
         query = searchOp({})
