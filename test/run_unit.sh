@@ -1,2 +1,3 @@
 #!/bin/bash
-python -m nose --with-allure --logdir=test/result/  --with-xcoverage --cover-package=app --xcoverage-file=test/result/coverage.xml ./test/unit
+python -m pytest --alluredir=test/result/ --cov=app --cov-report xml:test/result/coverage.xml ./test/unit/
+
