@@ -158,7 +158,7 @@ def register():
 
 
 @app.route('/add-property', methods=['GET', 'POST'])
-def add_roperty():
+def addProperty():
     g.role = 'hotel_admin'
     db = AndrewDB()
     form = RegisterForm()
