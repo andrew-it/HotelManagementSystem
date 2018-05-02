@@ -1,3 +1,4 @@
+import os
 import psycopg2
 from flask import g
 from typing import Optional
@@ -16,9 +17,10 @@ class AndrewDB(Database):
     ROLE_RECEPTIONIST = 'receptionist'
 
     def __connect_to_db(self):
-        connection = "dbname=hms user=postgres password=postgres host='0.0.0.0'"
+        options = os.getenv("HMS_DB", "dbname=hms user=postgres password=postgres host=127.0.0.1")
+
         try:
-            return psycopg2.connect(connection)
+            return psycopg2.connect(options)
         except Exception:
             print("Can't connect to database")
 

@@ -2,6 +2,7 @@ import json
 import random
 import re
 import time
+import os
 
 import psycopg2
 import psycopg2.extras
@@ -10,7 +11,8 @@ START_TIME = time.time()
 
 
 def connectToDB():
-    return psycopg2.connect("dbname=hms user=postgres password=postgres host='0.0.0.0'")
+    options = os.getenv("HMS_DB", "dbname=hms user=postgres password=postgres host=127.0.0.1")
+    return psycopg2.connect(options)
 
 
 def wrapper(str):

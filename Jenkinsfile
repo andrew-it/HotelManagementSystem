@@ -24,7 +24,11 @@ node {
 
         testImage.inside('-P --network host'){
             stage("Init Database"){
-                sh 'python init_db.py'
+                sh """
+                cd db_setup
+                python db_init.py
+                python db_gen.py
+                """
             }
         }
 

@@ -1,6 +1,9 @@
+import os
 import psycopg2
 
-connection = psycopg2.connect(dbname='hms', user='postgres', password='postgres', host='localhost', port='5432')
+options = os.getenv("HMS_DB", "dbname=hms user=postgres password=postgres host=127.0.0.1")
+
+connection = psycopg2.connect(options)
 cursor = connection.cursor()
 cursor.execute('''DROP SCHEMA public CASCADE;
                CREATE SCHEMA public;
