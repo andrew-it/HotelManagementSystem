@@ -201,7 +201,7 @@ def addProperty():
             flash('User with this email already registered')
             logger.info("User with this email (%s) alredy registered, redirecting to add property page" % form.email.data)
             return redirect(url_for('addProperty'))
-        user = User(res['user_id'], res['email'], res['password'], res['role'])
+        user = User(res['user_id'], form.email.data, hash_password, g.role)
         login_user(user)
         flash('User successfully registered')
         logger.info("User (ID = %s) successfully registered, redirecting to My hotels page" % user.get_id())
@@ -228,7 +228,12 @@ def get_profile():
                              res['payment_info'])
     elif user.is_hotel_admin():
         res = db.get_hotel_admin_by_id(user.user_id)
-        user_info = HotelAdmin(res['first_name'], res['last_name'], user.email, res['phone_number'])
+        if res:
+            user_info = HotelAdmin(res['first_name'], res['last_name'], user.email, res['phone_number'])
+        else:
+            flash("Unable to find a hotel admin entry")
+            logger.info("Unable to find a hotel admin entry, Redirecting to index page")
+            return redirect(url_for('index'))
     elif user.is_receptionist():
         user_info = db.get_receptionist_by_id(user.user_id)
         user_info['email'] = user.email
@@ -320,6 +325,8 @@ def addHotel():
                 except Exception as e:
                     logger.exception("Unable to add Hotel")
                     print(e)
+                    logger.info("Redirecting to My hotels page")
+                    return redirect(url_for('myHotels'))
                 form.img.data.save(os.path.join(app.config['UPLOAD_FOLDER'], img_name))
                 flash('Hotel was added')
                 logger.info("Hotel was added, Redirecting to My hotels page")
