@@ -21,9 +21,9 @@ node {
         }
     }
 
-    testImage.withRun('-p 5000:5000'){
+    testImage.withRun('-p 5000:5000 -h 0.0.0.0'){
         stage("API Test"){
-            testImage.inside {
+            testImage.inside('-P --network host') {
                 sh 'test/run_api.sh'
             }
         }
