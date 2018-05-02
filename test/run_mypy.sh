@@ -1,1 +1,1 @@
-python -m mypy app --ignore-missing imports --junit-xml test/result/mypy.xml || true
+python -m mypy app --ignore-missing-imports --junit-xml test/result/mypy.xml || true
