@@ -11,12 +11,12 @@ def test_API():
 
     with nose.allure.step('Index page accessibility'):
         try:
-            assert (session.get(f'{url}').status_code == OK)
-            assert (session.get(f'{url}/').status_code == OK)
-            assert (session.get(f'{url}/index').status_code == OK)
-            assert (session.get(f'{url}/abracadabra').status_code == NOT_FOUND)
+            assert session.get(f'{url}').status_code == OK
+            assert session.get(f'{url}/').status_code == OK
+            assert session.get(f'{url}/index').status_code == OK
+            assert session.get(f'{url}/abracadabra').status_code == NOT_FOUND
         except Exception as e:
-            raise str(e)
+            assert False
 
     # with nose.allure.step('Hotel searching'):
     #     check_in_d = '25-04-2018'
