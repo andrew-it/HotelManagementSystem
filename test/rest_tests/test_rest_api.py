@@ -16,14 +16,17 @@ def test_REST_API():
         assert (session.get(f'{url}/abracadabra').status_code == NOT_FOUND)
 
     with nose.allure.step('Hotel searching'):
-        check_in_d = '25-04-2018'
-        check_out_d = '26-04-2018'
+        check_in_d = '2018-04-25'
+        check_out_d = '2018-04-26'
         destination = 'e'
         search_url = f'{url}/search-hotel?checkin={check_in_d}&checkout={check_out_d}&destination={destination}'
         req = session.get(search_url)
-        assert (req.status_code == ERROR)
+        assert (req.status_code == OK)
 
     with nose.allure.step('Hotel info by id'):
         search_url = f'{url}/more-info/1'
         req = session.get(search_url)
-        assert (req.status_code == ERROR)
+        assert (req.status_code == OK)
+
+    with nose.allure.step('Hotel info by id'):
+        pass
