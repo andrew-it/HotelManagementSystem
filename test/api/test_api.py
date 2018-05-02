@@ -1,7 +1,7 @@
 import requests
 import allure
 
-@allure.feature('API test')
+@allure.feature('API')
 def test_API():
     url = 'http://localhost:5000'
     OK = 200
