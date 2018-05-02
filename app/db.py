@@ -1,17 +1,7 @@
 import psycopg2
 from flask import g
 from typing import Optional
-
-
-def searchOp(args):
-    d = ['is_bathroom', 'is_tv', 'is_wifi', 'is_bathhub', 'is_airconditioniring']
-    s = []
-    for key in d:
-        if args[key]:
-            line = 'ro.' + key + '=%(' + key + ')s'
-            s.append(line)
-    s = ' AND '.join(s)
-    return '(' + s + ')'
+from .helpers import searchOp
 
 
 class Database:

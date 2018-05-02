@@ -1,5 +1,4 @@
 import datetime
-import time
 
 import os.path
 import psycopg2
@@ -12,6 +11,7 @@ from app.db import AndrewDB
 from .forms import CAdmin, CReceptionistForm, CRoomForm, CUHotelForm, DBookingForm, DReceptionistForm, InfoForm, \
     LoginForm, ProfileForm, RegisterForm, ReserveRoomForm, SearchForm, UDHotelForm, UDRoomForm, URoomForm
 from .models import Customer, HotelAdmin, User
+from .helpers import reverseDate, imgName
 
 dictCursor = psycopg2.extras.DictCursor
 
@@ -22,17 +22,6 @@ def connectToDB():
         return psycopg2.connect(connection)
     except Exception:
         print("Can't connect to database")
-
-
-def imgName(filename):
-    img_name = None
-    if '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']:
-        img_name = str(time.time()) + '.' + filename.rsplit('.', 1)[1]
-    return img_name
-
-
-def reverseDate(date):
-    return '-'.join(date.split('-')[::-1])
 
 
 @app.route('/', methods=['GET', 'POST'])
