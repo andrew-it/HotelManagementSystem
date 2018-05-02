@@ -19,17 +19,6 @@ logger = logging.getLogger(__name__)
 
 dictCursor = psycopg2.extras.DictCursor
 
-
-def connectToDB():
-    logger.info("Connecting to the database")
-    connection = "dbname=hms user=postgres password=postgres host='0.0.0.0'"
-    try:
-        return psycopg2.connect(connection)
-    except Exception:
-        print("Can't connect to database")
-        logger.exception("Can't connext to the database")
-
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -87,7 +76,6 @@ def moreInfo(hotel_id):
         checkin = datetime.datetime.strptime(search['checkin'], '%Y-%m-%d').date()
         checkout = datetime.datetime.strptime(search['checkout'], '%Y-%m-%d').date()
         nights = (checkout - checkin).days
-        g.db = connectToDB()
         cost = db.get_cost_by_id(form.room_id.data)
         info['amount'] = int(form.quantity.data) * nights * int(cost)
         info['transaction_id'] = db.create_transaction_get_id(info)

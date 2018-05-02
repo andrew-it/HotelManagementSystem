@@ -8,6 +8,7 @@ node {
     }
 
     try {
+
         testImage.inside{
             stage("Unit Test"){
                 sh 'test/run_unit.sh'
@@ -32,12 +33,22 @@ node {
             }
         }
 
-        testImage.withRun('-p 5000:5000 -h 0.0.0.0'){
+        testImage.withRun('-p 5000:5000 -h 0.0.0.0 --link test_db -e HMS_DB="dbname=hms user=postgres password=postgres host=test_db"') { c ->
+
+            try {
             stage("API Test"){
                 testImage.inside('-P --network host') {
                     sh 'test/run_api.sh'
                 }
             }
+
+
+            stage("UI Test"){
+                testImage.inside('-P --network host') {
+                    sh 'test/run_ui.sh'
+                }
+            }
+
 
             stage("Benchmark"){
                 sh """
@@ -45,10 +56,18 @@ node {
                 ./run_bench.sh
                 """
             }
+            } finally {
+
+            stage("App logs"){
+                sh "docker logs ${c.id}"
+            }
+
+            }
         }
 
     } finally {
         stage("Allure report"){
+            archiveArtifacts artifacts: 'geckodriver.log', fingerprint: true
             allure includeProperties: false, jdk: '', results: [[path: 'test/unit/result'], [path: 'test/api/result'], [path: 'test/static/result']]
         }
 
