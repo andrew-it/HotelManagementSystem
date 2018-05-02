@@ -109,7 +109,7 @@ def login():
     form.csrf_enabled = False
     if form.validate_on_submit():
         sys_user = db.get_sys_user_by_email(form.email.data)
-        if not sys_user or not bcrypt.check_password_hash(sys_user['password'], form.password.data):
+        if not sys_user or not check_password(sys_user['password'], form.password.data):
             flash('Email Address or Password is invalid')
             logger.info("Email address or password is invalid, redirecting to the login page")
             return redirect(url_for('login'))
@@ -343,9 +343,7 @@ def editHotel(hotel_id):
         if form.validate_on_submit():
             img_name = imgName(form.img.data.filename)
             if img_name:
-                res = db.get_city(form.country.data, form.city.data)
-                if not res:
-                    db.add_city(form.country.data, form.city.data)
+                db.insert_location_if_not_exists(form.country.data, form.city.data)
 
                 old_img = db.get_image_name_by_hotel_id(hotel_id)
                 img_path = '/static/img/hotels/' + img_name
@@ -411,7 +409,7 @@ def manageHotel(hotel_id):
             logger.info("Validating the Create receptionist form")
             if recForm.validate_on_submit():
                 hash_password = bcrypt.generate_password_hash(recForm.password.data).decode('utf-8')
-                user_id = db.insert_user(recForm.email.data, hash_password, g.role)
+                user_id = db.insert_sys_user_get_id(recForm.email.data, hash_password, g.role)
                 if user_id:
                     flash('User with this email already registered')
                 else:
