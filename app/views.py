@@ -166,7 +166,7 @@ def addProperty():
         if not form.password.data == form.password_confirmation.data:
             return redirect(url_for('addProperty'))
         hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        res = db.insert_sys_user(form.email.data, hash_password)
+        res = db.insert_sys_user(form.email.data, hash_password, g.role)
         if res is None:
             flash('User with this email already registered')
             return redirect(url_for('addProperty'))
@@ -439,7 +439,7 @@ def admin():
         if user_id is None:
             flash('User with this email already registered')
             return redirect(url_for('admin'))
-        db.insert_admin(user_id, form.first_name.data, form.last_name.data, form.telephone.data)
+        db.insert_admin(str(user_id), form.first_name.data, form.last_name.data, form.telephone.data)
         flash("Admin was added")
         return redirect(url_for('admin'))
     hotels = db.get_all_hotels()

@@ -37,18 +37,18 @@ class AndrewDB(Database):
         g.role = role
         return g.db.cursor(cursor_factory=dict_cursor)
 
-    def insert_sys_user_get_id(self, email: str, password: str) -> Optional[int]:
-        res = self.insert_sys_user(email, password)
+    def insert_sys_user_get_id(self, email: str, password: str, role = ROLE_ADMIN) -> Optional[int]:
+        res = self.insert_sys_user(email, password, role)
         if res:
             return res['user_id']
         else:
             return None
 
-    def insert_sys_user(self, email: str, password: str):
+    def insert_sys_user(self, email: str, password: str, role):
         try:
             cur = self.__get_cursor(self.ROLE_ADMIN)
             cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING user_id;",
-                        (email, password, self.ROLE_ADMIN))
+                        (email, password, role))
             g.db.commit()
             return cur.fetchone()
         except psycopg2.IntegrityError:
@@ -60,9 +60,10 @@ class AndrewDB(Database):
             cur = self.__get_cursor(self.ROLE_ADMIN)
             cur.execute("SELECT * FROM sys_user WHERE email=%s;", (email,))
             g.db.commit()
+            return cur.fetchone()
         except Exception as e:
             print(e)
-        return cur.fetchone()
+            return None
 
     def insert_admin(self, user_id: str, f_name: str, l_name: str, phone_number: str) -> None:
         try:
@@ -132,7 +133,7 @@ class AndrewDB(Database):
 
     def get_customer_by_id(self, person_id):
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
-        cur.execute("SELECT * FROM customers WHERE person_id=%s", (person_id,))
+        cur.execute("SELECT * FROM customer WHERE person_id=%s", (person_id,))
         g.db.commit()
         return dict(cur.fetchone())
 
