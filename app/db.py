@@ -38,7 +38,7 @@ class AndrewDB(Database):
         g.role = role
         return g.db.cursor(cursor_factory=dict_cursor)
 
-    def insert_sys_user_get_id(self, email: str, password: str, role = ROLE_ADMIN) -> Optional[int]:
+    def insert_sys_user_get_id(self, email: str, password: str, role=ROLE_ADMIN) -> Optional[int]:
         res = self.insert_sys_user(email, password, role)
         if res:
             return res['user_id']
