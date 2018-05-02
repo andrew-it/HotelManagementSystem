@@ -1,13 +1,13 @@
 import time
 
-import nose
+import allure
 from selenium import webdriver
 
 
 def test_register():
     driver = webdriver.Firefox()
 
-    with nose.allure.step('Registration new user'):
+    with allure.step('Registration new user'):
         login_and_pass = str(int(time.time()))
 
         driver.get("http://127.0.0.1:5000/")
@@ -33,7 +33,7 @@ def test_register():
         driver.find_element_by_xpath("//button[@type='submit']").click()
         assert (True)
 
-    with nose.allure.step('Searching and booking a room'):
+    with allure.step('Searching and booking a room'):
         driver.get("http://127.0.0.1:5000/index")
         driver.find_element_by_link_text("Sign in").click()
         driver.find_element_by_id("email").click()

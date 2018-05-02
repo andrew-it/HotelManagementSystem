@@ -1,6 +1,6 @@
 import time
 
-import nose
+import allure
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import Select
 def test_add_ne_hotel_owner():
     driver = webdriver.Firefox()
 
-    with nose.allure.step('Hotel\'s owner registration'):
+    with allure.step('Hotel\'s owner registration'):
         login_and_pass = str(int(time.time()))
 
         driver.get("http://127.0.0.1:5000/index")
@@ -34,7 +34,7 @@ def test_add_ne_hotel_owner():
         driver.find_element_by_xpath("//button[@type='submit']").click()
         assert (True)
 
-    with nose.allure.step('New hotel adding'):
+    with allure.step('New hotel adding'):
         driver.get("http://127.0.0.1:5000/index")
         driver.find_element_by_link_text("Sign in").click()
         driver.find_element_by_id("email").click()
