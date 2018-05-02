@@ -13,6 +13,10 @@ from .forms import CAdmin, CReceptionistForm, CRoomForm, CUHotelForm, DBookingFo
 from .models import Customer, HotelAdmin, User
 from .helpers import reverseDate, imgName
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 dictCursor = psycopg2.extras.DictCursor
 
 

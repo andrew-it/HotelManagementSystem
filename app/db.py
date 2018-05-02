@@ -3,6 +3,10 @@ import psycopg2
 from flask import g
 from typing import Optional
 from .helpers import searchOp
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 class Database:

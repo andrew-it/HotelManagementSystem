@@ -4,6 +4,10 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from .models import AnonymousUser
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
 
 bcrypt = Bcrypt(app)
