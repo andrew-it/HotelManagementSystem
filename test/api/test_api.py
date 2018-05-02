@@ -15,8 +15,8 @@ def test_API():
             assert (session.get(f'{url}/').status_code == OK)
             assert (session.get(f'{url}/index').status_code == OK)
             assert (session.get(f'{url}/abracadabra').status_code == NOT_FOUND)
-        except:
-            print("WTF")
+        except Exception as e:
+            raise str(e)
 
     # with nose.allure.step('Hotel searching'):
     #     check_in_d = '25-04-2018'
