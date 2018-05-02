@@ -23,6 +23,14 @@ node {
         }
     }
 
+    testImage.withRun('-p 5000:5000'){
+        stage("API Test"){
+            testImage.inside {
+                sh 'test/run_api.sh'
+            }
+        }
+    }
+
      stage("Allure report"){
             allure includeProperties: false, jdk: '', results: [[path: 'test/result']]
      }
