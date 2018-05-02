@@ -2,6 +2,7 @@ import psycopg2
 from flask import g
 from typing import Optional
 
+
 def searchOp(args):
     d = ['is_bathroom', 'is_tv', 'is_wifi', 'is_bathhub', 'is_airconditioniring']
     s = []
