@@ -1,11 +1,13 @@
 import time
 import app
 
+
 def imgName(filename):
     img_name = None
     if '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']:
         img_name = str(time.time()) + '.' + filename.rsplit('.', 1)[1]
     return img_name
+
 
 def reverseDate(date):
     return '-'.join(date.split('-')[::-1])

@@ -3,6 +3,7 @@ from flask import g
 from typing import Optional
 from .helpers import searchOp
 
+
 class Database:
     def method(self):
         pass

@@ -1,5 +1,4 @@
 import datetime
-import time
 
 import os.path
 import psycopg2
@@ -15,6 +14,7 @@ from .models import Customer, HotelAdmin, User
 from .helpers import reverseDate, imgName
 
 dictCursor = psycopg2.extras.DictCursor
+
 
 def connectToDB():
     connection = "dbname=hms user=postgres password=postgres host='0.0.0.0'"
