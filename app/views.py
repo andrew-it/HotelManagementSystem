@@ -453,7 +453,8 @@ def manageHotel(hotel_id):
                 db.add_new_room(hotel_id, config_id, option_id, roomForm.quantity.data, roomForm.title.data,
                                 roomForm.description.data, roomForm.cost.data)
                 flash('Room was added')
-                logger.info("Receptionist was added (ID = %s), Redirecting to manage hotel page" % roomForm.user_id.data)
+                logger.info("Receptionist was added (ID = %s), Redirecting to manage hotel page"
+                            % roomForm.user_id.data)
                 return redirect(url_for('manageHotel', hotel_id=hotel_id))
         hotel = db.get_hotel_by_id(hotel_id)
         rooms = db.get_rooms_with_settings_by_id(hotel_id)

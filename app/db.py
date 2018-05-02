@@ -7,6 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Database:
     def method(self):
         pass
@@ -33,7 +34,6 @@ class AndrewDB(Database):
         g.db = self.__connect_to_db()
         g.role = role
         return g.db.cursor(cursor_factory=dict_cursor)
-
 
     def insert_sys_user_get_id(self, email: str, password: str, role = ROLE_ADMIN) -> Optional[int]:
         logger.info("Inserting system user, getting ID back")
@@ -547,7 +547,6 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
             logger.exception("Unable to update a customer")
-
 
     def update_hotel_admin(self, person_id, first_name, last_name, phone_number):
         try:
