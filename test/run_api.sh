@@ -1,2 +1,2 @@
 #!/bin/bash
-python -m nose --with-allure --logdir=test/result/ ./test/api
+py.test --alluredir=test/result/ ./test/api

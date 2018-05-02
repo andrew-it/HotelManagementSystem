@@ -1,6 +1,5 @@
-import nose
 import requests
-
+import allure
 
 def test_API():
     url = 'http://localhost:5000'
@@ -9,7 +8,7 @@ def test_API():
     ERROR = 500
     session = requests.Session()
 
-    with nose.allure.step('Index page accessibility'):
+    with allure.step('Index page accessibility'):
         assert session.get(f'{url}').status_code == OK
         assert session.get(f'{url}/').status_code == OK
         assert session.get(f'{url}/index').status_code == OK
