@@ -10,4 +10,5 @@ RUN pip install --no-cache-dir -r test/test_requirements.txt
 
 COPY . .
 EXPOSE 5000
-CMD ["python", "run.py"]
+
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:5000"]
