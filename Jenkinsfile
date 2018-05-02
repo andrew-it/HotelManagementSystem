@@ -17,6 +17,12 @@ node {
         }
     }
 
+    testImage.inside('-P --network host'){
+        stage("Init Database"){
+            sh 'python init_db.py'
+        }
+    }
+
      stage("Allure report"){
             allure includeProperties: false, jdk: '', results: [[path: 'test/result']]
      }
