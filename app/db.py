@@ -20,7 +20,7 @@ class Database:
 
 class AndrewDB(Database):
     ROLE_ADMIN = 'admin'
-    ROLE_CUSTOMER = 'costomer'
+    ROLE_CUSTOMER = 'customer'
     ROLE_HOTEL_ADMIN = 'hotel_admin'
     ROLE_RECEPTIONIST = 'receptionist'
 
