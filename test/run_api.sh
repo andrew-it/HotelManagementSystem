@@ -1,2 +1,2 @@
 #!/bin/bash
-python -m pytest --alluredir=test/result/ --allure_features=API ./test/api/
+python -m pytest --alluredir=test/result/  --allure-features=API, ./test/api/
