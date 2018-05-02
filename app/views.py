@@ -10,14 +10,15 @@ from app import app, bcrypt, login_manager
 from app.db import AndrewDB
 from .forms import CAdmin, CReceptionistForm, CRoomForm, CUHotelForm, DBookingForm, DReceptionistForm, InfoForm, \
     LoginForm, ProfileForm, RegisterForm, ReserveRoomForm, SearchForm, UDHotelForm, UDRoomForm, URoomForm
-from .helpers import reverseDate, imgName
 from .models import Customer, HotelAdmin, User
+from .helpers import reverseDate, imgName, check_password
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 dictCursor = psycopg2.extras.DictCursor
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
