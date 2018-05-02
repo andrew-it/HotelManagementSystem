@@ -7,8 +7,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-
 class Database:
     def method(self):
         pass
@@ -22,11 +20,12 @@ class AndrewDB(Database):
 
     def __connect_to_db(self):
         options = os.getenv("HMS_DB", "dbname=hms user=postgres password=postgres host=127.0.0.1")
-
+        logger.info("Connecting to database")
         try:
             return psycopg2.connect(options)
         except Exception:
             print("Can't connect to database")
+            logger.exception("Can't connect to database")
 
     def __get_cursor(self, role: str):
         dict_cursor = psycopg2.extras.DictCursor
