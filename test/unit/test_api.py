@@ -1,5 +1,6 @@
-import requests
 import allure
+import requests
+
 
 @allure.feature('API')
 def test_API():
