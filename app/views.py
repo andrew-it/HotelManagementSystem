@@ -35,6 +35,7 @@ def connectToDB():
 def index():
     logger.info("Got an index page request: %s" % request)
     form = SearchForm()
+    form.csrf_enabled = False
     if request.method == 'POST':
         logger.info("Validating the search hotel form")
         if form.validate_on_submit():
@@ -57,7 +58,7 @@ def searchHotel():
     logger.info("Got a search hotel page request: %s" % request)
     db = AndrewDB()
     form = InfoForm()
-    hotels = None
+    form.csrf_enabled = False
     search = session['search']
     if request.method == 'POST':
         if current_user.is_anonymous():
@@ -77,6 +78,7 @@ def moreInfo(hotel_id):
     logger.info("Got a more info page request: %s" % request)
     db = AndrewDB()
     form = ReserveRoomForm()
+    form.csrf_enabled = False
     search = session['search']
     search['hotel_id'] = hotel_id
     if request.method == 'POST':
@@ -116,6 +118,7 @@ def login():
     db = AndrewDB()
     form = LoginForm()
     logger.info("Validating the login form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         sys_user = db.get_sys_user_by_email(form.email.data)
         if not sys_user or not bcrypt.check_password_hash(sys_user['password'], form.password.data):
@@ -161,6 +164,7 @@ def register():
     db = AndrewDB()
     form = RegisterForm()
     logger.info("Validating the register form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         if not form.password.data == form.password_confirmation.data:
             logger.info("Password confirmation failed, Redirecting to register page")
@@ -199,7 +203,8 @@ def addProperty():
         res = db.insert_sys_user(form.email.data, hash_password, g.role)
         if res is None:
             flash('User with this email already registered')
-            logger.info("User with this email (%s) alredy registered, redirecting to add property page" % form.email.data)
+            logger.info("User with this email (%s) alredy registered, "
+                        "redirecting to add property page" % form.email.data)
             return redirect(url_for('addProperty'))
         user = User(res['user_id'], form.email.data, hash_password, g.role)
         login_user(user)
