@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Database:
-    def method(self):
-        pass
+    pass
 
 
 class AndrewDB(Database):
@@ -24,9 +23,9 @@ class AndrewDB(Database):
         logger.info("Connecting to database")
         try:
             return psycopg2.connect(options)
-        except Exception:
-            print("Can't connect to database")
-            logger.exception("Can't connect to database")
+        except Exception as e:
+            print("Can't connect to database: ", e)
+            logger.exception("Can't connect to database: ", e)
 
     def __get_cursor(self, role: str):
         logger.info("Getting the database cursor")
@@ -43,11 +42,12 @@ class AndrewDB(Database):
         else:
             return None
 
-    def insert_sys_user(self, email: str, password: str, role):
+    def insert_sys_user(self, email: str, password: str, role=ROLE_ADMIN):
         try:
             logger.info("Trying to insert system user")
             cur = self.__get_cursor(self.ROLE_ADMIN)
-            cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING user_id;",
+            cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) "
+                        "RETURNING (user_id, email, password, role)",
                         (email, password, role))
             g.db.commit()
             return cur.fetchone()
@@ -181,7 +181,7 @@ class AndrewDB(Database):
             cur = self.__get_cursor(self.ROLE_CUSTOMER)
             cur.execute("SELECT * FROM hotel WHERE hotel_id=%s;", (hotel_id,))
             g.db.commit()
-            return cur.fetchone()
+            return dict(cur.fetchone())
         except Exception as e:
             logger.exception("Couldn't find a hotel")
             print(e)
@@ -333,19 +333,6 @@ class AndrewDB(Database):
             print(e)
             return False
 
-    def insert_user(self, email, password, role):
-        try:
-            logger.info("Trying to insert a user")
-            cur = self.__get_cursor(self.ROLE_RECEPTIONIST)
-            cur.execute("INSERT INTO sys_user (email, password, role) VALUES (%s, %s, %s) RETURNING user_id;",
-                        (email, password, role))
-            g.db.commit()
-            return cur.fetchone()['user_id']
-        except psycopg2.IntegrityError:
-            logger.exception("Couldn't insert a user")
-            g.db.rollback()
-            return None
-
     def add_new_receptionist(self, user_id, hotel_id, f_name, l_name, phone, salary) -> bool:
         try:
             logger.info("Trying to add a new receptionist")
@@ -387,10 +374,10 @@ class AndrewDB(Database):
             print(e)
             return None
 
-    def get_cost_by_id(self, id):
+    def get_cost_by_id(self, room_id):
         logger.info("Trying to get a cost by room id=%s" % id)
         cur = self.__get_cursor(self.ROLE_CUSTOMER)
-        cur.execute("SELECT cost FROM room WHERE room_id=%s", (id,))
+        cur.execute("SELECT cost FROM room WHERE room_id=%s", (room_id,))
         g.db.commit()
         return cur.fetchone()['cost']
 
@@ -421,30 +408,6 @@ class AndrewDB(Database):
             "VALUES (%s, %s, %s, %s, %s, %s, %s);",
             (city, address, name, stars, description, owner_id, img))
         g.db.commit()
-
-    def get_city(self, country, city):
-        logger.info("Trying to get a city")
-        cur = self.__get_cursor(self.ROLE_CUSTOMER)
-        try:
-            cur.execute("SELECT * FROM country WHERE country=%s AND city=%s;", (country, city))
-            g.db.commit()
-            return cur.fetchone()
-        except Exception as e:
-            print(e)
-            logger.exception("Unable to get a city")
-
-    def add_city(self, country, city) -> bool:
-        logger.info("Trying to add a city")
-        cur = self.__get_cursor(self.ROLE_ADMIN)
-        try:
-            cur.execute("INSERT INTO country (country, city) VALUES (%s, %s);",
-                        (country, city))
-            g.db.commit()
-            return True
-        except Exception as e:
-            logger.exception("Unable to add a city")
-            print(e)
-            return False
 
     def get_image_name_by_hotel_id(self, hotel_id):
         logger.info("Trying to get image name by hotel id=%s" % hotel_id)
@@ -637,15 +600,3 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
             logger.exception("Unable to list hotels")
-
-
-class PostgresDatabase(Database):
-    def method(self):
-        # TODO
-        pass
-
-
-class DummyDatabase(Database):
-    def method(self):
-        # TODO
-        pass

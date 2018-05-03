@@ -1,5 +1,5 @@
+from app import app, bcrypt
 import time
-import app
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,8 +20,15 @@ def searchOp(args):
     d = ['is_bathroom', 'is_tv', 'is_wifi', 'is_bathhub', 'is_airconditioniring']
     s = []
     for key in d:
-        if args[key]:
+        if key in args:
             line = 'ro.' + key + '=%(' + key + ')s'
             s.append(line)
-    s = ' AND '.join(s)
-    return '(' + s + ')'
+    if len(s) != 0:
+        s = ' AND '.join(s)
+        return '(' + s + ')'
+    else:
+        return ""
+
+
+def check_password(hash, password):
+    return bcrypt.check_password_hash(hash, password)

@@ -6,7 +6,6 @@ email = "user_email@example.com"
 password = "12345678"
 
 
-
 def create_user(role="querty"):
     return User(user_id, email, password, role)
 
@@ -27,7 +26,6 @@ def test_user_init():
         assert(user.password == password)
 
 
-
 @allure.feature('Status')
 def test_user_status():
     """Check status-marking methods for a signed-in user"""
@@ -42,6 +40,9 @@ def test_user_status():
 
     with allure.step('[NEGATIVE] Check that a user is not anonymous'):
         assert (not user.is_anonymous())
+
+    with allure.step('Check that a user has a user ID'):
+        assert (user.get_id() is not None)
 
 
 @allure.feature('Status')
@@ -176,6 +177,7 @@ def test_anonymous_user_role():
     with allure.step('Check that a user is not a receptionist'):
         assert (not user.is_receptionist())
 
+
 @allure.feature('Initialization')
 def test_customer():
     """Test that Customer object is initialized correctly"""
@@ -187,7 +189,6 @@ def test_customer():
 
     with allure.step('Initialize customer'):
         customer = Customer(first_name, last_name, email, phone_number, payment_info)
-
 
     with allure.step('Check first name'):
         assert(customer.first_name == first_name)
@@ -203,7 +204,6 @@ def test_customer():
 
     with allure.step('Check payment info'):
         assert(customer.payment_info == payment_info)
-
 
 
 @allure.feature('Initialization')
