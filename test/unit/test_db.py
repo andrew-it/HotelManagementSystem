@@ -4,10 +4,10 @@ import mock
 from app import app
 from app.db import AndrewDB, searchOp
 
-
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_insert_sys_user_get_id(mock_connect):
+    """Insert new user into database and return its id"""
     with allure.step('Insert into sys_user and get id'):
         with app.app_context():
             db = AndrewDB()
@@ -20,6 +20,7 @@ def test_insert_sys_user_get_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_insert_sys_user(mock_connect):
+    """Insert new user into database and return its contents"""
     with allure.step('Insert into sys_user and get user'):
         with app.app_context():
             db = AndrewDB()
@@ -28,9 +29,11 @@ def test_insert_sys_user(mock_connect):
             result = db.insert_sys_user("email@example.com", "123456")
         assert result == expected
 
+
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_sys_user_by_email(mock_connect):
+    """Get user from database contents by E-mail"""
     with allure.step('Get sys_user by email'):
         with app.app_context():
             db = AndrewDB()
@@ -43,6 +46,7 @@ def test_get_sys_user_by_email(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_insert_admin(mock_connect):
+    """Insert new admin into database"""
     with allure.step('Insert into admin'):
         with app.app_context():
             db = AndrewDB()
@@ -52,6 +56,7 @@ def test_insert_admin(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_hotels(mock_connect):
+    """Get all hotels from database"""
     with allure.step('Get all hotels'):
         with app.app_context():
             db = AndrewDB()
@@ -64,6 +69,7 @@ def test_get_hotels(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_sys_users(mock_connect):
+    """Get all existing users from database"""
     with allure.step('Get all system users'):
         with app.app_context():
             db = AndrewDB()
@@ -76,6 +82,7 @@ def test_get_sys_users(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_db_statistics(mock_connect):
+    """Get IO database performance"""
     with allure.step('Get db statistics'):
         with app.app_context():
             db = AndrewDB()
@@ -88,7 +95,8 @@ def test_get_db_statistics(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_admins(mock_connect):
-    with allure.step('Get all hotels'):
+    """Get all administrator users from database"""
+    with allure.step('Get all admins'):
         with app.app_context():
             db = AndrewDB()
             expected = ['admin1', 'admin2']
@@ -100,6 +108,7 @@ def test_get_admins(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_room_by_params(mock_connect):
+    """Get rooms list from database by parameters"""
     with allure.step('Get room by parameters'):
         with app.app_context():
             db = AndrewDB()
@@ -112,6 +121,7 @@ def test_get_room_by_params(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_receptionists(mock_connect):
+    """Get all receptionist users from database"""
     with allure.step('Get all receptionists'):
         with app.app_context():
             db = AndrewDB()
@@ -124,6 +134,7 @@ def test_get_receptionists(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_vw_hotel_by_id(mock_connect):
+    """Get visual data of hotel from database by id"""
     with allure.step('Get vw hotel by id'):
         with app.app_context():
             db = AndrewDB()
@@ -136,6 +147,7 @@ def test_get_vw_hotel_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_vw_customer_by_id(mock_connect):
+    """Get visual data of customer from database by id"""
     with allure.step('Get vw customer by id'):
         with app.app_context():
             db = AndrewDB()
@@ -148,6 +160,7 @@ def test_get_vw_customer_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_customer_by_id(mock_connect):
+    """Get customer user from database by id"""
     with allure.step('Get customer by id'):
         with app.app_context():
             db = AndrewDB()
@@ -160,6 +173,7 @@ def test_get_customer_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_hotel_admin_by_id(mock_connect):
+    """Get administrator user of hotel from database by id """
     with allure.step('Get hotel_admin by id'):
         with app.app_context():
             db = AndrewDB()
@@ -172,6 +186,7 @@ def test_get_hotel_admin_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_receptionist_by_id(mock_connect):
+    """Get receptionist user form database by id"""
     with allure.step('Get receptionist by id'):
         with app.app_context():
             db = AndrewDB()
@@ -184,6 +199,7 @@ def test_get_receptionist_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_admin_by_id(mock_connect):
+    """Get administrator user from database by id"""
     with allure.step('Get admin by id'):
         with app.app_context():
             db = AndrewDB()
@@ -196,6 +212,7 @@ def test_get_admin_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_hotel_by_id(mock_connect):
+    """Get hotel data from database by id"""
     with allure.step('Get hotel by id'):
         with app.app_context():
             db = AndrewDB()
@@ -208,6 +225,7 @@ def test_get_hotel_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_rooms_with_settings_by_id(mock_connect):
+    """Get hotel rooms list from database with settings"""
     with allure.step('Get rooms_with_settings by id'):
         with app.app_context():
             db = AndrewDB()
@@ -220,6 +238,7 @@ def test_get_rooms_with_settings_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_booked_rooms_by_hotel_id(mock_connect):
+    """Get booked rooms list of hotel by hotel id"""
     with allure.step('Get booked rooms by hotel id'):
         with app.app_context():
             db = AndrewDB()
@@ -232,6 +251,7 @@ def test_get_booked_rooms_by_hotel_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_delete_transaction(mock_connect):
+    """Remove transaction from database by id"""
     with allure.step('Delete transaction'):
         with app.app_context():
             db = AndrewDB()
@@ -241,6 +261,7 @@ def test_delete_transaction(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_some_info_by_user_id(mock_connect):
+    """Get info on bookings and their details by customer id"""
     with allure.step('Get some info by user id'):
         with app.app_context():
             db = AndrewDB()
@@ -253,6 +274,7 @@ def test_get_some_info_by_user_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_options_by_params(mock_connect):
+    """Get rooms options from database by parameters"""
     with allure.step('Get options by parameters'):
         with app.app_context():
             db = AndrewDB()
@@ -265,6 +287,7 @@ def test_get_options_by_params(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_insert_option(mock_connect):
+    """Insert room option and get its id"""
     with allure.step('Insert option'):
         with app.app_context():
             db = AndrewDB()
@@ -277,22 +300,27 @@ def test_insert_option(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_delete_room_by_id(mock_connect):
+    """Remove hotel room from database by its id"""
     with allure.step('Delete room by id'):
         with app.app_context():
             db = AndrewDB()
             db.delete_room_by_id(1)
 
+
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_delete_receptionist_by_id(mock_connect):
+    """Remove receptionist user from database by its id"""
     with allure.step('Delete receptionist by id'):
         with app.app_context():
             db = AndrewDB()
             db.delete_receptionist_by_id(1)
 
+
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_select_config_id(mock_connect):
+    """Get bed configuration id from database"""
     with allure.step('Select config id'):
         with app.app_context():
             db = AndrewDB()
@@ -305,6 +333,7 @@ def test_select_config_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_insert_config(mock_connect):
+    """Insert new bed configuration into database"""
     with allure.step('Insert config'):
         with app.app_context():
             db = AndrewDB()
@@ -314,6 +343,7 @@ def test_insert_config(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_setup_room_by_id(mock_connect):
+    """"""
     with allure.step('Set up room by id'):
         with app.app_context():
             db = AndrewDB()
@@ -445,6 +475,7 @@ def create_search_form(is_bathroom=True, is_tv=True, is_wifi=True, is_bathhub=Tr
         'price_to': 100
     }
 
+
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_search_get_rooms(mock_connect):
@@ -492,6 +523,7 @@ def test_update_admin(mock_connect):
             db = AndrewDB()
             db.update_admin(1, "John", "Doe", "+0-000-00-00-00")
 
+
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_search_hotel_by_form(mock_connect):
@@ -536,13 +568,14 @@ def test_get_hotels_by_admin_id(mock_connect):
             result = db.get_hotels_by_admin_id(1)
         assert result == expected
 
+
 @allure.feature("Helpers")
 def test_searchOp():
     """Test that seatchOp generates valid SQL queries"""
 
     with allure.step("Check that empty form yields empty SQL query"):
         query = searchOp({})
-        assert(len(query) == 0)
+        assert (len(query) == 0)
 
     with allure.step("[NEGATIVE] Check that non-empty form yields non-empty SQL query"):
         query = searchOp(create_search_form())
@@ -556,7 +589,7 @@ def test_searchOp():
         query = searchOp(create_search_form())
         assert (query ==
                 "(ro.is_bathroom=%(is_bathroom)s AND "
-                 "ro.is_tv=%(is_tv)s AND "
-                 "ro.is_wifi=%(is_wifi)s AND "
-                 "ro.is_bathhub=%(is_bathhub)s AND "
-                 "ro.is_airconditioniring=%(is_airconditioniring)s)")
+                "ro.is_tv=%(is_tv)s AND "
+                "ro.is_wifi=%(is_wifi)s AND "
+                "ro.is_bathhub=%(is_bathhub)s AND "
+                "ro.is_airconditioniring=%(is_airconditioniring)s)")
