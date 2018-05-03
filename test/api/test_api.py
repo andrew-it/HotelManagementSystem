@@ -26,6 +26,7 @@ registration_data_broken_email = {'first_name': curr_time, 'last_name': curr_tim
 
 @allure.feature('API')
 def test_registration():
+    """Registration tests with several cases"""
     with allure.step('Registration new user'):
         register_url = f'{url}/register'
         req = client.post(register_url, data=registration_data)
@@ -70,6 +71,7 @@ def test_registration():
 
 @allure.feature('API')
 def test_index_accessibility():
+    """Simple test of index page accessibility"""
     with allure.step('Index page accessibility'):
         assert req_session.get(f'{url}').status_code == OK
         assert req_session.get(f'{url}/').status_code == OK
@@ -80,6 +82,7 @@ def test_index_accessibility():
 
 @allure.feature('API')
 def test_hotel_searching():
+    """Search hotel by 'destination', 'checkin', 'checkout' and other parameters"""
     request_data = {'destination': 'e', 'checkin': '02-05-2018', 'checkout': '03-05-2018', 'is_bathroom': False,
                     'is_tv': False, 'is_wifi': False, 'is_bathhub': False, 'is_airconditioniring': False,
                     'sleeps': 1, 'price_from': 0, 'price_to': 0, 'quantity': 1}
@@ -107,6 +110,7 @@ def test_hotel_searching():
 
 @allure.feature('API')
 def test_more_info():
+    """Get more info about hotel"""
     request_data = {'destination': 'e', 'checkin': '02-05-2018', 'checkout': '03-05-2018', 'is_bathroom': False,
                     'is_tv': False, 'is_wifi': False, 'is_bathhub': False, 'is_airconditioniring': False,
                     'sleeps': 1, 'price_from': 0, 'price_to': 0, 'quantity': 1, 'hotel_id': '2'}
@@ -138,6 +142,7 @@ owner_data_existing_email = {'first_name': curr_time, 'last_name': curr_time, 'e
 
 @allure.feature('API')
 def test_add_property():
+    """Add new hotel"""
     url_link = f'{url}/add-property'
     with allure.step('Add property with broken password'):
         req = owner.post(url_link, data=owner_data_broken_pass)
@@ -165,6 +170,7 @@ def test_add_property():
 
 @allure.feature('API')
 def test_get_profile():
+    """Get profile of some user"""
     with allure.step('Get person`s profile'):
         profile_url = f'{url}/profile'
         req = owner.get(profile_url, data=owner_data)
@@ -178,6 +184,7 @@ def test_get_profile():
 
 @allure.feature('API')
 def test_update_profile():
+    """Update profile of some user"""
     with allure.step('Update person`s profile'):
         profile_url = f'{url}/profile'
         req = owner.post(profile_url, data=owner_data)
@@ -192,6 +199,7 @@ def test_update_profile():
 
 @allure.feature('API')
 def test_my_hotels():
+    """Get all owner's hotels"""
     with allure.step('Get owners`s hotels: POST'):
         hotel_url = f'{url}/my-hotel'
         req = owner.post(hotel_url, data=owner_data)
@@ -212,6 +220,7 @@ def test_my_hotels():
 
 @allure.feature('API')
 def test_add_hotel():
+    """Add new hotel"""
     with allure.step('Add hotel'):
         add_hotel_url = f'{url}/add-hotel'
         req = owner.post(add_hotel_url, data=owner_data)
@@ -226,6 +235,7 @@ def test_add_hotel():
 
 @allure.feature('API')
 def test_edit_hotel():
+    """Hotel information editing"""
     with allure.step('Edit hotel'):
         edit_hotel_url = f'{url}/edit-hotel'
         req = owner.post(edit_hotel_url, data=owner_data)
@@ -238,6 +248,7 @@ def test_edit_hotel():
 
 @allure.feature('API')
 def test_manage_hotel():
+    """Manage hotel testing"""
     with allure.step('Manage hotel'):
         manage_hotel_url = f'{url}/manage-hotel/1'
         req = owner.post(manage_hotel_url, data=owner_data)
@@ -252,6 +263,7 @@ def test_manage_hotel():
 
 @allure.feature('API')
 def test_my_booking():
+    """Customer's booking list testing"""
     with allure.step('My booking'):
         my_booking_url = f'{url}/my-booking'
         req = owner.post(my_booking_url, data=owner_data)
@@ -264,6 +276,7 @@ def test_my_booking():
 
 @allure.feature('API')
 def test_manage_booking():
+    """Booking manage testing"""
     with allure.step('Manage booking'):
         manage_booking_url = f'{url}/manage-booking'
         req = owner.post(manage_booking_url, data=owner_data)
@@ -276,6 +289,7 @@ def test_manage_booking():
 
 @allure.feature('API')
 def test_new_booking():
+    """Creating new booking testing"""
     with allure.step('New booking'):
         new_booking_url = f'{url}/new-booking'
         req = owner.post(new_booking_url, data=registration_data)
@@ -288,6 +302,7 @@ def test_new_booking():
 
 @allure.feature('API')
 def test_admin():
+    """Admin panel testing"""
     with allure.step('Admin panel'):
         admin_panel_url = f'{url}/admin-panel'
         req = owner.post(admin_panel_url, data=owner_data)
