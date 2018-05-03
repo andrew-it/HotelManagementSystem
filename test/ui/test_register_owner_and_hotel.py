@@ -7,6 +7,7 @@ from time import sleep
 
 @allure.feature('UI')
 def test_add_ne_hotel_owner(browser):
+    """Test Hotel Owner registration and Hotel creation"""
     driver = browser
     with allure.step('Hotel\'s owner registration'):
         login_and_pass = str(int(time.time()))

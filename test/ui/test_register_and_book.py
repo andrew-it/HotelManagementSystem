@@ -4,6 +4,7 @@ from time import sleep
 
 @allure.feature('UI')
 def test_register(browser):
+    """Test User Registration and Hotel Room Booking"""
     driver = browser
 
     with allure.step('Registration new user'):
