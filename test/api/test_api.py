@@ -257,12 +257,20 @@ def test_my_booking():
         req = owner.post(my_booking_url, data=owner_data)
         assert req.status_code == OK
 
+    with allure.step('[NEGATIVE]: Empty data'):
+        req = owner.post(my_booking_url, data={})
+        assert req.status_code == OK
+
 
 @allure.feature('API')
 def test_manage_booking():
     with allure.step('Manage booking'):
         manage_booking_url = f'{url}/manage-booking'
         req = owner.post(manage_booking_url, data=owner_data)
+        assert req.status_code == ERROR
+
+    with allure.step('[NEGATIVE]: Empty data'):
+        req = owner.post(manage_booking_url, data={})
         assert req.status_code == ERROR
 
 
@@ -273,10 +281,18 @@ def test_new_booking():
         req = owner.post(new_booking_url, data=registration_data)
         assert req.status_code == ERROR
 
+    with allure.step('[NEGATIVE]: Empty data'):
+        req = owner.post(new_booking_url, data={})
+        assert req.status_code == ERROR
+
 
 @allure.feature('API')
 def test_admin():
     with allure.step('Admin panel'):
         admin_panel_url = f'{url}/admin-panel'
         req = owner.post(admin_panel_url, data=owner_data)
+        assert req.status_code == ERROR
+
+    with allure.step('[NEGATIVE]: Empty data'):
+        req = owner.post(admin_panel_url, data={})
         assert req.status_code == ERROR
