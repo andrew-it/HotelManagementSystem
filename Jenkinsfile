@@ -67,7 +67,6 @@ node {
 
     } finally {
         stage("Allure report"){
-            archiveArtifacts artifacts: 'geckodriver.log', fingerprint: true
             allure includeProperties: false, jdk: '', results: [[path: 'test/unit/result'], [path: 'test/api/result'], [path: 'test/static/result'], [path: 'test/ui/result']]
         }
 
