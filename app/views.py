@@ -2,7 +2,6 @@ import datetime
 import logging
 
 import os.path
-import psycopg2
 import psycopg2.extras
 from flask import flash, g, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
@@ -11,8 +10,8 @@ from app import app, bcrypt, login_manager
 from app.db import AndrewDB
 from .forms import CAdmin, CReceptionistForm, CRoomForm, CUHotelForm, DBookingForm, DReceptionistForm, InfoForm, \
     LoginForm, ProfileForm, RegisterForm, ReserveRoomForm, SearchForm, UDHotelForm, UDRoomForm, URoomForm
-from .models import Customer, HotelAdmin, User
 from .helpers import reverseDate, imgName, check_password
+from .models import Customer, HotelAdmin, User
 
 logger = logging.getLogger(__name__)
 
@@ -198,6 +197,8 @@ def addProperty():
                         "redirecting to add property page" % form.email.data)
             return redirect(url_for('addProperty'))
         user_id = res[0].strip('()').split(',')[0]
+        db.insert_hotel_admin(str(user_id), str(form.first_name.data),
+                              str(form.last_name.data), str(form.telephone.data))
         print(user_id)
         user = User(user_id, form.email.data, hash_password, g.role)
         login_user(user)

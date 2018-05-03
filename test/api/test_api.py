@@ -146,6 +146,8 @@ def test_add_property():
         assert req.status_code == FOUND
         assert 'add-property' in req.location
 
+    with allure.step('Negative'):
+        pass
 
 @allure.feature('API')
 def test_get_profile():
@@ -155,7 +157,8 @@ def test_get_profile():
         owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
                       'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
         req = client.get(profile_url, data=owner_data)
-        assert req.status_code == OK
+        assert req.status_code == FOUND
+        assert 'index' in req.location
 
 
 @allure.feature('API')
@@ -172,7 +175,14 @@ def test_update_profile():
 
 @allure.feature('API')
 def test_my_hotels():
-    pass
+    with allure.step('Get owners`s hotels'):
+        hotel_url = f'{url}/my-hotel'
+        curr_time = str(int(time.time()))
+        owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                      'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
+        req = client.post(hotel_url, data=owner_data)
+        assert req.status_code == FOUND
+        assert 'login' in req.location
 
 
 @allure.feature('API')

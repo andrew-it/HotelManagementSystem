@@ -1,9 +1,11 @@
+import logging
 import os
+from typing import Optional
+
 import psycopg2
 from flask import g
-from typing import Optional
+
 from .helpers import searchOp
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +81,18 @@ class AndrewDB(Database):
         except Exception as e:
             logger.exception("Unable to insert the admin")
             print(e)
+
+    def insert_hotel_admin(self, person_id, first_name, last_name, phone_number):
+        try:
+            logger.info("Trying to update a hotel admin")
+            cur = self.__get_cursor(self.ROLE_HOTEL_ADMIN)
+            cur.execute(
+                "INSERT INTO hotel_admin (person_id, first_name, last_name, phone_number) VALUES (%s, %s, %s, %s);",
+                (person_id, first_name, last_name, phone_number))
+            g.db.commit()
+        except Exception as e:
+            print(e)
+            logger.exception("Unable to add a hotel admin")
 
     def get_all_hotels(self):
         logger.info("Trying to get all hotels")
