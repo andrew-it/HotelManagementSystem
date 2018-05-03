@@ -203,7 +203,8 @@ def addProperty():
         res = db.insert_sys_user(form.email.data, hash_password, g.role)
         if res is None:
             flash('User with this email already registered')
-            logger.info("User with this email (%s) alredy registered, redirecting to add property page" % form.email.data)
+            logger.info("User with this email (%s) alredy registered, "
+                        "redirecting to add property page" % form.email.data)
             return redirect(url_for('addProperty'))
         user = User(res['user_id'], form.email.data, hash_password, g.role)
         login_user(user)
