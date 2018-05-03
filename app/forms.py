@@ -3,6 +3,10 @@ from wtforms import BooleanField, FileField, HiddenField, IntegerField, Password
     SubmitField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class LoginForm(FlaskForm):
     email = StringField('email', validators=[DataRequired()])

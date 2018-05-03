@@ -1,5 +1,8 @@
 import time
 import app
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def imgName(filename):

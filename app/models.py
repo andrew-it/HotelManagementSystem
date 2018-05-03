@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 class User(object):
 
     def __init__(self, user_id, email, password, role):
