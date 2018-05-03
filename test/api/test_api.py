@@ -13,6 +13,7 @@ NOT_ALLOWED = 405
 ERROR = 500
 req_session = requests.Session()
 client = app.test_client()
+owner = app.test_client()
 
 
 @allure.feature('API')
@@ -39,17 +40,17 @@ def test_registration():
         assert req.status_code == FOUND
         assert 'register' in req.location
 
-    with allure.step('Negative: empty fields'):
+    with allure.step('[NEGATIVE]: empty fields'):
         req = client.post(register_url, data={})
         assert req.status_code == OK
         assert req.location is None
 
-    with allure.step('Negative: missed fields'):
+    with allure.step('[NEGATIVE]: missed fields'):
         req = client.post(register_url, data={'first_name': curr_time})
         assert req.status_code == OK
         assert req.location is None
 
-    with allure.step('Negative: broken email'):
+    with allure.step('[NEGATIVE]: broken email'):
         req = client.post(register_url, data=registration_data_broken_email)
         assert req.status_code == FOUND
         assert 'index' in req.location
@@ -72,7 +73,7 @@ def test_index_accessibility():
         assert req_session.get(f'{url}').status_code == OK
         assert req_session.get(f'{url}/').status_code == OK
         assert req_session.get(f'{url}/index').status_code == OK
-    with allure.step('Negative: unexisting link'):
+    with allure.step('[NEGATIVE]: unexisting link'):
         assert req_session.get(f'{url}/abracadabra').status_code == NOT_FOUND
 
 
@@ -99,7 +100,7 @@ def test_hotel_searching():
         assert req.status_code == OK
 
 
-# TODO
+# # TODO
 # @allure.feature('API')
 # def test_more_info():
 #     request_data = {'destination': 'e', 'checkin': '02-05-2018', 'checkout': '03-05-2018', 'is_bathroom': False,
@@ -118,76 +119,70 @@ def test_hotel_searching():
 #         req = client.post(search_url, data=hotel_id_data)
 #         assert req.status_code == FOUND
 #         assert 'login' in req.location
+curr_time = str(int(time.time()))
+owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+              'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
+owner_data_broken_pass = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                          'password': curr_time, 'password_confirmation': '11', 'telephone': curr_time}
+owner_data_existing_email = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                             'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
 
 
-# TODO
 @allure.feature('API')
 def test_add_property():
-    curr_time = str(int(time.time()))
-    owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
-                  'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
-    owner_data_broken_pass = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
-                              'password': curr_time, 'password_confirmation': '11', 'telephone': curr_time}
-    owner_data_existing_email = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
-                                 'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
     url_link = f'{url}/add-property'
     with allure.step('Add property with broken password'):
-        req = client.post(url_link, data=owner_data_broken_pass)
+        req = owner.post(url_link, data=owner_data_broken_pass)
         assert req.status_code == OK
-        # assert 'addProperty' in req.location
 
     with allure.step('Add property with same email'):
-        req = client.post(url_link, data=owner_data_existing_email)
-        assert req.status_code == FOUND
-        assert 'my-hotel' in req.location
-
-    with allure.step('Add property success'):
-        req = client.post(url_link, data=owner_data)
+        req = owner.post(url_link, data=owner_data_existing_email)
         assert req.status_code == FOUND
         assert 'add-property' in req.location
 
-    with allure.step('Negative'):
+    with allure.step('Add property success'):
+        req = owner.post(url_link, data=owner_data)
+        assert req.status_code == FOUND
+        assert 'add-property' in req.location
+
+    with allure.step('[NEGATIVE]'):
         pass
+
 
 @allure.feature('API')
 def test_get_profile():
     with allure.step('Get person`s profile'):
         profile_url = f'{url}/profile'
-        curr_time = str(int(time.time()))
-        owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
-                      'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
-        req = client.get(profile_url, data=owner_data)
-        assert req.status_code == FOUND
-        assert 'index' in req.location
+        req = owner.get(profile_url, data=owner_data)
+        assert req.status_code == OK
 
 
 @allure.feature('API')
 def test_update_profile():
     with allure.step('Update person`s profile'):
         profile_url = f'{url}/profile'
-        curr_time = str(int(time.time()))
-        owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
-                      'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
-        req = client.post(profile_url, data=owner_data)
+        req = owner.post(profile_url, data=owner_data)
         assert req.status_code == FOUND
         assert 'index' in req.location
 
 
 @allure.feature('API')
 def test_my_hotels():
-    with allure.step('Get owners`s hotels'):
+    with allure.step('Get owners`s hotels: POST'):
         hotel_url = f'{url}/my-hotel'
-        curr_time = str(int(time.time()))
-        owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
-                      'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
-        req = client.post(hotel_url, data=owner_data)
+        req = owner.post(hotel_url, data=owner_data)
         assert req.status_code == FOUND
-        assert 'login' in req.location
+
+    with allure.step('Get owners`s hotels: GET'):
+        hotel_url = f'{url}/my-hotel'
+        req = owner.get(hotel_url, data=owner_data)
+        assert req.status_code == FOUND
 
 
 @allure.feature('API')
 def test_add_hotel():
-    pass
+    with allure.step('Add hotel'):
+        add_hotel_url = f'{url}/add-hotel'
 
 
 @allure.feature('API')

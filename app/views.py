@@ -165,7 +165,6 @@ def register():
             return redirect(url_for('register'))
 
         user_id = res[0].strip('()').split(',')[0]
-        print(user_id)
         db.add_customer(user_id, form.first_name.data, form.last_name.data, form.telephone.data)
 
         user = User(user_id, form.email.data, hash_password, g.role)
