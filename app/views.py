@@ -166,9 +166,11 @@ def register():
             logger.info("User with this email (%s) alredy registered, redirecting to register page" % form.email.data)
             return redirect(url_for('register'))
 
-        db.add_customer(res['user_id'], form.first_name.data, form.last_name.data, form.telephone.data)
+        user_id = res[0].strip('()').split(',')[0]
+        print(user_id)
+        db.add_customer(user_id, form.first_name.data, form.last_name.data, form.telephone.data)
 
-        user = User(res['user_id'], form.email.data, hash_password, g.role)
+        user = User(user_id, form.email.data, hash_password, g.role)
         login_user(user)
         flash('User successfully registered')
         logger.info("User (ID = %s) successfully registered, redirecting to index page" % user.get_id())
@@ -195,7 +197,9 @@ def addProperty():
             logger.info("User with this email (%s) alredy registered, "
                         "redirecting to add property page" % form.email.data)
             return redirect(url_for('addProperty'))
-        user = User(res['user_id'], form.email.data, hash_password, g.role)
+        user_id = res[0].strip('()').split(',')[0]
+        print(user_id)
+        user = User(user_id, form.email.data, hash_password, g.role)
         login_user(user)
         flash('User successfully registered')
         logger.info("User (ID = %s) successfully registered, redirecting to My hotels page" % user.get_id())
