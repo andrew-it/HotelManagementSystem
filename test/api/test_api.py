@@ -98,6 +98,7 @@ def test_hotel_searching():
         req = client.get(search_url)
         assert req.status_code == OK
 
+
 # TODO
 # @allure.feature('API')
 # def test_more_info():
@@ -117,3 +118,57 @@ def test_hotel_searching():
 #         req = client.post(search_url, data=hotel_id_data)
 #         assert req.status_code == FOUND
 #         assert 'login' in req.location
+
+@allure.feature('API')
+def test_add_property():
+    pass
+
+
+@allure.feature('API')
+def test_get_profile():
+    pass
+
+
+@allure.feature('API')
+def test_update_profile():
+    pass
+
+
+@allure.feature('API')
+def test_my_hotels():
+    pass
+
+
+@allure.feature('API')
+def test_add_hotel():
+    pass
+
+
+@allure.feature('API')
+def test_edit_hotel():
+    pass
+
+
+@allure.feature('API')
+def test_manage_hotel():
+    pass
+
+
+@allure.feature('API')
+def test_my_booking():
+    pass
+
+
+@allure.feature('API')
+def test_manage_booking():
+    pass
+
+
+@allure.feature('API')
+def test_new_booking():
+    pass
+
+
+@allure.feature('API')
+def test_admin():
+    pass
