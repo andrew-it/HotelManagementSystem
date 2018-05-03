@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import os.path
 import psycopg2
@@ -12,8 +13,6 @@ from .forms import CAdmin, CReceptionistForm, CRoomForm, CUHotelForm, DBookingFo
     LoginForm, ProfileForm, RegisterForm, ReserveRoomForm, SearchForm, UDHotelForm, UDRoomForm, URoomForm
 from .models import Customer, HotelAdmin, User
 from .helpers import reverseDate, imgName, check_password
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -186,6 +185,7 @@ def addProperty():
     db = AndrewDB()
     form = RegisterForm()
     logger.info("Validating the register form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         if not form.password.data == form.password_confirmation.data:
             logger.info("Password confirmation failed, Redirecting to add property page")
@@ -216,7 +216,7 @@ def get_profile():
     form = ProfileForm()
     user = current_user
     user_info = None
-
+    form.csrf_enabled = False
     if user.is_customer():
         res = db.get_customer_by_id(user.user_id)
         user_info = Customer(res['first_name'],
@@ -250,6 +250,7 @@ def update_profile():
     form = ProfileForm()
     user = current_user
     logger.info("Validating the profile form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         if user.is_customer():
             db.update_customer(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data,
@@ -276,6 +277,7 @@ def myHotels():
     logger.info("Got a My hotels page request: %s" % request)
     db = AndrewDB()
     form = UDHotelForm()
+    form.csrf_enabled = False
     if current_user.is_hotel_admin():
         logger.info("Validating the Update or Delete hotel form")
         if form.validate_on_submit():
@@ -309,6 +311,7 @@ def addHotel():
     logger.info("Got an Add hotel page request: %s" % request)
     db = AndrewDB()
     form = CUHotelForm()
+    form.csrf_enabled = False
     if current_user.is_hotel_admin():
         logger.info("Validating the Create and Update hotel form")
         if form.validate_on_submit():
@@ -343,6 +346,7 @@ def editHotel(hotel_id):
     logger.info("Got an Edit hotel page request: %s" % request)
     db = AndrewDB()
     form = CUHotelForm()
+    form.csrf_enabled = False
     if current_user.is_hotel_admin():
         logger.info("Validating the Create and Update hotel form")
         if form.validate_on_submit():
@@ -377,6 +381,9 @@ def manageHotel(hotel_id):
     form = UDRoomForm()
     form2 = URoomForm()
     form3 = DReceptionistForm()
+    form.csrf_enabled = False
+    form2.csrf_enabled = False
+    form3.csrf_enabled = False
     if current_user.is_hotel_admin():
         if form.delete.data:
             if db.delete_room_by_id(form.room_id.data):
@@ -472,6 +479,7 @@ def myBooking():
     form = DBookingForm()
     today = datetime.datetime.now().date()
     logger.info("Validating the Delete booking form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         if not db.delete_transaction(form.transaction_id.data):
             flash("Reservation has been cancelled")
@@ -517,6 +525,7 @@ def admin():
     db = AndrewDB()
     g.role = 'admin'
     logger.info("Validating the Create admin form")
+    form.csrf_enabled = False
     if request.method == 'POST' and form.validate_on_submit():
         hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user_id = db.insert_sys_user_get_id(form.email.data, hash_password)

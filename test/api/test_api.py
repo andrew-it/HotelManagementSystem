@@ -119,19 +119,55 @@ def test_hotel_searching():
 #         assert req.status_code == FOUND
 #         assert 'login' in req.location
 
+
+# TODO
 @allure.feature('API')
 def test_add_property():
-    pass
+    curr_time = str(int(time.time()))
+    owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                  'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
+    owner_data_broken_pass = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                              'password': curr_time, 'password_confirmation': '11', 'telephone': curr_time}
+    owner_data_existing_email = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                                 'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
+    url_link = f'{url}/add-property'
+    with allure.step('Add property with broken password'):
+        req = client.post(url_link, data=owner_data_broken_pass)
+        assert req.status_code == OK
+        # assert 'addProperty' in req.location
+
+    with allure.step('Add property with same email'):
+        req = client.post(url_link, data=owner_data_existing_email)
+        assert req.status_code == FOUND
+        assert 'my-hotel' in req.location
+
+    with allure.step('Add property success'):
+        req = client.post(url_link, data=owner_data)
+        assert req.status_code == FOUND
+        assert 'add-property' in req.location
 
 
 @allure.feature('API')
 def test_get_profile():
-    pass
+    with allure.step('Get person`s profile'):
+        profile_url = f'{url}/profile'
+        curr_time = str(int(time.time()))
+        owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                      'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
+        req = client.get(profile_url, data=owner_data)
+        assert req.status_code == OK
 
 
 @allure.feature('API')
 def test_update_profile():
-    pass
+    with allure.step('Update person`s profile'):
+        profile_url = f'{url}/profile'
+        curr_time = str(int(time.time()))
+        owner_data = {'first_name': curr_time, 'last_name': curr_time, 'email': curr_time + '@inno.ru',
+                      'password': curr_time, 'password_confirmation': curr_time, 'telephone': curr_time}
+        req = client.post(profile_url, data=owner_data)
+        assert req.status_code == FOUND
+        assert 'index' in req.location
 
 
 @allure.feature('API')
