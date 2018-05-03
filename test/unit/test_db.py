@@ -343,7 +343,7 @@ def test_insert_config(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_setup_room_by_id(mock_connect):
-    """"""
+    """Update hotel room parameters"""
     with allure.step('Set up room by id'):
         with app.app_context():
             db = AndrewDB()
@@ -353,6 +353,7 @@ def test_setup_room_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_add_new_receptionist(mock_connect):
+    """Add new receptionist user"""
     with allure.step('Add receptionist'):
         with app.app_context():
             db = AndrewDB()
@@ -362,6 +363,7 @@ def test_add_new_receptionist(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_add_new_room(mock_connect):
+    """Add new hotel room with parameters"""
     with allure.step('Add new room'):
         with app.app_context():
             db = AndrewDB()
@@ -371,6 +373,7 @@ def test_add_new_room(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_receptionists_by_hotel_id(mock_connect):
+    """Fetch receptionist user data by hotel id"""
     with allure.step('Get receptionists of hotel'):
         with app.app_context():
             db = AndrewDB()
@@ -383,6 +386,7 @@ def test_get_receptionists_by_hotel_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_get_cost_by_id(mock_connect):
+    """FEtch room price by room id"""
     with allure.step('Get cost by room id'):
         with app.app_context():
             db = AndrewDB()
@@ -395,6 +399,7 @@ def test_get_cost_by_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_create_transaction_get_id(mock_connect):
+    """Create transaction and get its id"""
     with allure.step('Create transaction and get id'):
         with app.app_context():
             db = AndrewDB()
@@ -407,6 +412,7 @@ def test_create_transaction_get_id(mock_connect):
 @allure.feature("Database")
 @mock.patch("psycopg2.connect")
 def test_insert_location_if_not_exists(mock_connect):
+    """"""
     with allure.step('Add new room'):
         with app.app_context():
             db = AndrewDB()
