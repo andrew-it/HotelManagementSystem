@@ -1,7 +1,7 @@
 import datetime
+import logging
 
 import os.path
-import psycopg2
 import psycopg2.extras
 from flask import flash, g, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
@@ -10,10 +10,8 @@ from app import app, bcrypt, login_manager
 from app.db import AndrewDB
 from .forms import CAdmin, CReceptionistForm, CRoomForm, CUHotelForm, DBookingForm, DReceptionistForm, InfoForm, \
     LoginForm, ProfileForm, RegisterForm, ReserveRoomForm, SearchForm, UDHotelForm, UDRoomForm, URoomForm
-from .models import Customer, HotelAdmin, User
 from .helpers import reverseDate, imgName, check_password
-
-import logging
+from .models import Customer, HotelAdmin, User
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +165,6 @@ def register():
             return redirect(url_for('register'))
 
         user_id = res[0].strip('()').split(',')[0]
-        print(user_id)
         db.add_customer(user_id, form.first_name.data, form.last_name.data, form.telephone.data)
 
         user = User(user_id, form.email.data, hash_password, g.role)
@@ -186,6 +183,7 @@ def addProperty():
     db = AndrewDB()
     form = RegisterForm()
     logger.info("Validating the register form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         if not form.password.data == form.password_confirmation.data:
             logger.info("Password confirmation failed, Redirecting to add property page")
@@ -198,6 +196,8 @@ def addProperty():
                         "redirecting to add property page" % form.email.data)
             return redirect(url_for('addProperty'))
         user_id = res[0].strip('()').split(',')[0]
+        db.insert_hotel_admin(str(user_id), str(form.first_name.data),
+                              str(form.last_name.data), str(form.telephone.data))
         print(user_id)
         user = User(user_id, form.email.data, hash_password, g.role)
         login_user(user)
@@ -216,7 +216,7 @@ def get_profile():
     form = ProfileForm()
     user = current_user
     user_info = None
-
+    form.csrf_enabled = False
     if user.is_customer():
         res = db.get_customer_by_id(user.user_id)
         user_info = Customer(res['first_name'],
@@ -250,6 +250,7 @@ def update_profile():
     form = ProfileForm()
     user = current_user
     logger.info("Validating the profile form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         if user.is_customer():
             db.update_customer(user.user_id, form.first_name.data, form.last_name.data, form.telephone.data,
@@ -276,6 +277,7 @@ def myHotels():
     logger.info("Got a My hotels page request: %s" % request)
     db = AndrewDB()
     form = UDHotelForm()
+    form.csrf_enabled = False
     if current_user.is_hotel_admin():
         logger.info("Validating the Update or Delete hotel form")
         if form.validate_on_submit():
@@ -309,6 +311,7 @@ def addHotel():
     logger.info("Got an Add hotel page request: %s" % request)
     db = AndrewDB()
     form = CUHotelForm()
+    form.csrf_enabled = False
     if current_user.is_hotel_admin():
         logger.info("Validating the Create and Update hotel form")
         if form.validate_on_submit():
@@ -343,6 +346,7 @@ def editHotel(hotel_id):
     logger.info("Got an Edit hotel page request: %s" % request)
     db = AndrewDB()
     form = CUHotelForm()
+    form.csrf_enabled = False
     if current_user.is_hotel_admin():
         logger.info("Validating the Create and Update hotel form")
         if form.validate_on_submit():
@@ -377,6 +381,9 @@ def manageHotel(hotel_id):
     form = UDRoomForm()
     form2 = URoomForm()
     form3 = DReceptionistForm()
+    form.csrf_enabled = False
+    form2.csrf_enabled = False
+    form3.csrf_enabled = False
     if current_user.is_hotel_admin():
         if form.delete.data:
             if db.delete_room_by_id(form.room_id.data):
@@ -472,6 +479,7 @@ def myBooking():
     form = DBookingForm()
     today = datetime.datetime.now().date()
     logger.info("Validating the Delete booking form")
+    form.csrf_enabled = False
     if form.validate_on_submit():
         if not db.delete_transaction(form.transaction_id.data):
             flash("Reservation has been cancelled")
@@ -482,6 +490,7 @@ def myBooking():
 
 
 @app.route('/manage-booking', methods=['GET', 'POST'])
+@login_required
 def manageBooking():
     logger.info("Got a Manage booking page request: %s" % request)
     db = AndrewDB()
@@ -517,17 +526,18 @@ def admin():
     db = AndrewDB()
     g.role = 'admin'
     logger.info("Validating the Create admin form")
+    form.csrf_enabled = False
     if request.method == 'POST' and form.validate_on_submit():
         hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user_id = db.insert_sys_user_get_id(form.email.data, hash_password)
         if user_id is None:
             flash('User with this email already registered')
             logger.info("User with this email already registered, Redirecting to admin page")
-            return redirect(url_for('admin'))
+            return redirect(url_for('admin-panel'))
         db.insert_admin(str(user_id), form.first_name.data, form.last_name.data, form.telephone.data)
         flash("Admin was added")
         logger.info("Admin was added, Redirecting to admin page")
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin-panel'))
     hotels = db.get_all_hotels()
     users = db.get_all_system_users()
     db_stat = db.get_db_statistics()
