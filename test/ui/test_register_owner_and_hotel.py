@@ -1,13 +1,13 @@
 import time
-
 import allure
-from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
+from time import sleep
 
-def test_add_ne_hotel_owner():
-    driver = webdriver.Firefox()
 
+@allure.feature('UI')
+def test_add_ne_hotel_owner(browser):
+    driver = browser
     with allure.step('Hotel\'s owner registration'):
         login_and_pass = str(int(time.time()))
 
@@ -36,19 +36,24 @@ def test_add_ne_hotel_owner():
 
     with allure.step('New hotel adding'):
         driver.get("http://127.0.0.1:5000/index")
-        driver.find_element_by_link_text("Sign in").click()
-        driver.find_element_by_id("email").click()
-        driver.find_element_by_id("password").clear()
-        driver.find_element_by_id("password").send_keys(login_and_pass)
-        driver.find_element_by_id("email").click()
-        driver.find_element_by_id("email").clear()
-        driver.find_element_by_id("email").send_keys(f"{login_and_pass}@innopolis.ru")
-        driver.find_element_by_id("password").click()
-        driver.find_element_by_xpath("//button[@type='submit']").click()
+        # driver.implicitly_wait(10)
+        # driver.find_element_by_link_text("Sign in").click()
+        # driver.implicitly_wait(10)
+        # driver.find_element_by_id("email").click()
+        # driver.find_element_by_id("password").clear()
+        # driver.find_element_by_id("password").send_keys(login_and_pass)
+        # driver.find_element_by_id("email").click()
+        # driver.find_element_by_id("email").clear()
+        # driver.find_element_by_id("email").send_keys(f"{login_and_pass}@innopolis.ru")
+        # driver.find_element_by_id("password").click()
+        # driver.find_element_by_xpath("//button[@type='submit']").click()
+        driver.implicitly_wait(10)
 
         # driver.get("http://127.0.0.1:5000/")
-        # driver.find_element_by_partial_link_text("My hotels").click()
+        driver.find_element_by_partial_link_text("My hotels").click()
+        driver.implicitly_wait(10)
         driver.find_element_by_id("add_hotel").click()
+        driver.implicitly_wait(10)
         driver.find_element_by_id("hotel_name").click()
         driver.find_element_by_id("hotel_name").clear()
         driver.find_element_by_id("hotel_name").send_keys(login_and_pass)
@@ -66,4 +71,5 @@ def test_add_ne_hotel_owner():
         driver.find_element_by_xpath("//option[@value='5']").click()
         # driver.find_element_by_xpath("//div[2]/div/label").click()
         driver.find_element_by_xpath("//button[@type='submit']").click()
+        driver.implicitly_wait(10)
         assert (True)

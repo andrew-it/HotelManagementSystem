@@ -6,3 +6,5 @@ mypy==0.580
 requests
 pytest-cov
 mock==2.0.0
+selenium==3.9.0
+pyvirtualdisplay

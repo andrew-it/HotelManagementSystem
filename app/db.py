@@ -518,7 +518,7 @@ class AndrewDB(Database):
         try:
             cur.execute(query, search)
             g.db.commit()
-            cur.fetchall()
+            return cur.fetchall()
         except Exception as e:
             print(e)
             logger.exception("Unable to get rooms")
