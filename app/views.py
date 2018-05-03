@@ -490,6 +490,7 @@ def myBooking():
 
 
 @app.route('/manage-booking', methods=['GET', 'POST'])
+@login_required
 def manageBooking():
     logger.info("Got a Manage booking page request: %s" % request)
     db = AndrewDB()
@@ -532,11 +533,11 @@ def admin():
         if user_id is None:
             flash('User with this email already registered')
             logger.info("User with this email already registered, Redirecting to admin page")
-            return redirect(url_for('admin'))
+            return redirect(url_for('admin-panel'))
         db.insert_admin(str(user_id), form.first_name.data, form.last_name.data, form.telephone.data)
         flash("Admin was added")
         logger.info("Admin was added, Redirecting to admin page")
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin-panel'))
     hotels = db.get_all_hotels()
     users = db.get_all_system_users()
     db_stat = db.get_db_statistics()
