@@ -600,4 +600,3 @@ class AndrewDB(Database):
         except Exception as e:
             print(e)
             logger.exception("Unable to list hotels")
-
